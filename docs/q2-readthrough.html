@@ -1,0 +1,421 @@
+<!doctype html>
+<!-- ==========================================================================
+     Cascadia Finance — Q2 FY2026 Read-Through
+     ------------------------------------------------------------------------
+     PROVENANCE NOTE FOR MAINTAINERS
+     This page is deliberately OUTSIDE the frozen XBRL dataset. Every Q2 FY2026
+     figure here comes from FormFactor's Q2 earnings release (8-K Item 2.02,
+     EX-99.1, furnished 2026-07-29) — unaudited and NOT XBRL-tagged. Nothing on
+     this page was written to data/raw/, data/conformed/, or cascadia_semi.db,
+     and no value here feeds any Phase 1-3 chart.
+
+     Phases 1-3 remain frozen as-of 2026-07-21 and are untouched.
+
+     When the Q2 10-Q is filed (projected ~2026-08-04 on a 6-day 8-K-to-10-Q
+     lag, consistent across the prior six quarters), the same figures become
+     tagged facts, enter the dataset through the normal ingest path, and this
+     page should be replaced by a reconciliation of announced vs. filed.
+     ========================================================================== -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cascadia Finance — FormFactor Q2 FY2026 Read-Through</title>
+<link rel="stylesheet" href="assets/cascadia.css">
+<style>
+  /* Additive only — nothing here overrides cascadia.css tokens. */
+  .tier {
+    background: #fdf8ec; border: 1px solid #e8d6a8; border-left: 5px solid #c98500;
+    border-radius: 10px; padding: 14px 18px; margin: 18px 0 6px;
+    font-size: 13.5px; color: var(--ink-2);
+  }
+  .tier .badge {
+    display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .09em;
+    text-transform: uppercase; color: #7a5200; background: #f5e6c4;
+    border-radius: 5px; padding: 3px 9px; margin-bottom: 8px;
+  }
+  .tier p { margin: 0 0 7px; max-width: 86ch; }
+  .tier p:last-child { margin-bottom: 0; }
+  .tier strong { color: var(--ink); }
+
+  .src { font-size: 11px; color: var(--muted); font-weight: 500; }
+  .kpi .src { display: block; margin-top: 6px; }
+
+  table.dt {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+    font-variant-numeric: tabular-nums; margin-top: 10px;
+  }
+  table.dt th, table.dt td {
+    text-align: right; padding: 7px 10px; border-bottom: 1px solid var(--grid);
+  }
+  table.dt th:first-child, table.dt td:first-child { text-align: left; }
+  table.dt thead th { color: var(--ink-2); font-weight: 600; border-bottom: 1px solid var(--baseline); }
+  table.dt tbody tr:last-child td { border-bottom: none; }
+  table.dt td.tot { font-weight: 650; }
+  .swatch {
+    display: inline-block; width: 10px; height: 10px; border-radius: 2px;
+    margin-right: 7px; vertical-align: baseline;
+  }
+  .tablewrap {
+    background: var(--surface); border: 1px solid var(--ring);
+    border-radius: 10px; padding: 6px 18px 10px; margin-top: 14px;
+  }
+  .tablewrap h3 { font-size: 14px; font-weight: 650; margin: 12px 0 0; }
+  .tablewrap .chart-sub { font-size: 12px; color: var(--muted); margin: 1px 0 2px; }
+  .gap-list li { margin: 9px 0; max-width: 88ch; }
+  .chart { height: 285px; }
+  .gap-list code { overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="site-head">
+    <p class="kicker">
+      <a href="index.html">← Executive pack (Phase 1)</a> ·
+      <a href="margins.html">Margins &amp; segments (Phase 2)</a> ·
+      <a href="peers.html">Peer benchmark (Phase 3)</a>
+    </p>
+    <h1>FormFactor (NASDAQ: FORM) — Q2 FY2026 Read-Through</h1>
+    <p class="subtitle">
+      Applying this module's Q1 margin-walk method to the Q2 figures FormFactor
+      announced on July 29, 2026 — and asking how much of the gross-margin
+      recovery is operational, and how much is a one-time charge not repeating.
+    </p>
+    <span class="asof">Earnings release furnished <strong>2026-07-29</strong> · quarter ended <strong>2026-06-27</strong> · this page written <strong>2026-07-30</strong></span>
+  </header>
+
+  <!-- ============ PROVENANCE TIER — the most important block on the page ============ -->
+  <div class="tier">
+    <span class="badge">Press release — not XBRL-tagged</span>
+    <p><strong>These Q2 figures are not part of this module's dataset, and they are not in EDGAR XBRL.</strong>
+      Earnings-release financials are furnished as an 8-K Item&nbsp;2.02 EX-99.1 exhibit, and those
+      exhibits are not XBRL-tagged — so no <code>us-gaap</code> facts flow into the
+      <code>companyfacts</code> API until the 10-Q is filed. The newest FormFactor fact in XBRL today
+      still ends <strong>2026-03-28</strong>.</p>
+    <p><strong>Phases 1–3 are untouched and remain frozen as of 2026-07-21.</strong> Nothing on this page
+      was loaded into <code>data/</code> or the SQLite star schema, and no figure here appears in any
+      Phase 1–3 chart. Q1 comparatives below come from the <em>filed</em> Q1 10-Q (XBRL); Q2 values come
+      from the <em>announced</em> release. Every number is labelled with which.</p>
+    <p><strong>Expected in filed facts on or about 2026-08-04.</strong> FormFactor's earnings-8-K→10-Q lag
+      has been 6 days for each of the prior six quarters (7 days once, in Q2 FY2024). When the 10-Q lands,
+      these figures become tagged facts, enter the dataset through the normal ingest path, and this page
+      is replaced by a reconciliation of announced versus filed — published whichever way it comes out.</p>
+  </div>
+
+  <!-- ============ 1. AT A GLANCE ============ -->
+  <h2>Q2 FY2026 as announced</h2>
+  <p class="section-note">Quarter ended June 27, 2026. Sequential comparison against filed Q1 FY2026 (XBRL).</p>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <p class="label">Revenue</p>
+      <p class="value">$258.2<span class="unit">M</span></p>
+      <div class="chips"><span class="chip up">▲ +14.2% <span class="tag">QoQ</span></span></div>
+      <p class="foot">Above the top of the $240M ± $5M guide</p>
+      <span class="src">Announced · 8-K EX-99.1</span>
+    </div>
+    <div class="kpi">
+      <p class="label">Gross margin (GAAP)</p>
+      <p class="value">50.7<span class="unit">%</span></p>
+      <div class="chips"><span class="chip up">▲ +12.3 pts <span class="tag">QoQ</span></span></div>
+      <p class="foot">Gross profit $130.9M · Q1 was 38.4%</p>
+      <span class="src">Announced · 8-K EX-99.1</span>
+    </div>
+    <div class="kpi">
+      <p class="label">Gross margin (non-GAAP)</p>
+      <p class="value">53.3<span class="unit">%</span></p>
+      <div class="chips"><span class="chip up">▲ +4.3 pts <span class="tag">QoQ</span></span></div>
+      <p class="foot">Company-defined basis · Q1 was 49.0%</p>
+      <span class="src">Announced · 8-K EX-99.1</span>
+    </div>
+    <div class="kpi">
+      <p class="label">Diluted EPS (GAAP)</p>
+      <p class="value">$0.71</p>
+      <div class="chips"><span class="chip up">▲ +$0.45 <span class="tag">QoQ</span></span></div>
+      <p class="foot">Operating income $57.8M · net income $56.2M</p>
+      <span class="src">Announced · 8-K EX-99.1</span>
+    </div>
+  </div>
+
+  <!-- ============ 2. THE WALK ============ -->
+  <h2>The gross-profit walk — same method as Phase 2</h2>
+  <p class="section-note">
+    Each quarter's change in gross profit splits exactly into a revenue effect
+    (Δrevenue × prior-quarter GM%) and a margin effect (ΔGM% × current revenue).
+  </p>
+
+  <ul class="callouts">
+    <li>Gross profit rose <strong>$44.1M</strong>, from $86.8M to $130.9M.</li>
+    <li>Only <strong>$12.3M</strong> of that is the <strong>revenue effect</strong> — (258.2 − 226.1) × 38.38%.</li>
+    <li><strong>$31.8M</strong> is the <strong>margin effect</strong> — (50.71 − 38.38)% × 258.2. The two sum to the change, to the rounding.</li>
+    <li>This is the exact mirror of Q1 FY2026, where the same decomposition gave <strong>+$4.6M revenue effect and −$8.6M margin effect</strong>: revenue grew while margin compressed. In Q2 both move the same way.</li>
+  </ul>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <h3>Gross-profit bridge — Q1 to Q2 FY2026</h3>
+      <p class="chart-sub">$M · revenue effect + margin effect = Δ gross profit</p>
+      <div id="c1" class="chart"></div>
+      <p class="fallback-note" id="c1fb" hidden>Chart unavailable — see the table below.</p>
+    </div>
+    <div class="chart-card">
+      <h3>Three margin bases, same two quarters</h3>
+      <p class="chart-sub">% of revenue · GAAP as reported vs. ex-restructuring vs. company non-GAAP</p>
+      <div id="c2" class="chart"></div>
+      <p class="fallback-note" id="c2fb" hidden>Chart unavailable — see the table below.</p>
+    </div>
+  </div>
+
+  <!-- ============ 3. THE NORMALIZATION ============ -->
+  <h2>How much of the recovery is operational?</h2>
+  <p class="section-note">
+    The headline GAAP improvement overstates it. Isolating the one item that is
+    separately disclosed in both quarters closes most of the gap.
+  </p>
+
+  <ul class="callouts">
+    <li>Restructuring charges recorded <strong>in cost of revenue</strong> fell from
+      <strong>$21.5M in Q1</strong> (per the Q1 10-Q MD&amp;A) to <strong>$4.29M in Q2</strong>
+      (per the Q2 release) — a <strong>$17.2M</strong> cost that did not repeat.</li>
+    <li>That <strong>$17.2M is 54% of the entire $31.8M margin effect.</strong> More than half of the
+      margin recovery is a charge normalizing, not the business improving.</li>
+    <li>Add the charge back to both quarters and gross margin goes
+      <strong>47.9% → 52.4%, about +4.5 points</strong> — against a headline GAAP move of +12.3 points.</li>
+    <li>The company's own non-GAAP gross margin moved <strong>49.0% → 53.3%, +4.3 points.</strong>
+      <strong>The GAAP-only normalization lands within about two tenths of a point of management's
+      non-GAAP delta, without using any non-GAAP input.</strong> The ~1-point difference in <em>level</em>
+      is stock-based compensation and acquisition-related amortization, which non-GAAP also excludes and
+      this normalization does not; those were roughly stable across the two quarters, so the <em>deltas</em>
+      agree even though the levels do not.</li>
+    <li>The remaining <strong>$14.6M</strong> of margin effect — roughly 5.7 points on Q2 revenue —
+      reflects volume, factory utilization, mix, and tariff refunds. <strong>It is not decomposed further
+      here, because none of those components is separately quantified in the release.</strong>
+      Management noted Q2 benefited from refunds of tariffs previously paid, and guided that
+      non-recurring items contribute roughly 300&nbsp;bps to Q3 gross margin — but did not size the Q2
+      refund. Phase 2 does not estimate price/volume/mix, and neither does this page.</li>
+  </ul>
+
+  <!-- ============ 4. TABLE VIEW ============ -->
+  <div class="tablewrap">
+    <h3>Table view</h3>
+    <p class="chart-sub">All figures $M except margins. Q1 filed (XBRL); Q2 announced (press release).</p>
+    <table class="dt">
+      <thead>
+        <tr><th>Measure</th><th>Q1 FY2026 <span class="src">filed</span></th><th>Q2 FY2026 <span class="src">announced</span></th><th>Change</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Revenue</td><td>226.14</td><td>258.20</td><td>+32.06</td></tr>
+        <tr><td>Gross profit</td><td>86.79</td><td>130.92</td><td class="tot">+44.13</td></tr>
+        <tr><td>&nbsp;&nbsp;of which revenue effect</td><td>—</td><td>—</td><td>+12.30</td></tr>
+        <tr><td>&nbsp;&nbsp;of which margin effect</td><td>—</td><td>—</td><td>+31.83</td></tr>
+        <tr><td><span class="swatch" style="background:#2a78d6"></span>GAAP gross margin</td><td>38.38%</td><td>50.71%</td><td>+12.33 pts</td></tr>
+        <tr><td>Restructuring in cost of revenue</td><td>21.50</td><td>4.29</td><td>−17.21</td></tr>
+        <tr><td><span class="swatch" style="background:#008300"></span>Gross margin ex-restructuring</td><td>47.89%</td><td>52.37%</td><td>+4.48 pts</td></tr>
+        <tr><td><span class="swatch" style="background:#e87ba4"></span>Gross margin, company non-GAAP</td><td>49.00%</td><td>53.30%</td><td>+4.30 pts</td></tr>
+        <tr><td>Diluted EPS (GAAP)</td><td>$0.26</td><td>$0.71</td><td>+$0.45</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============ 5. WHAT ISN'T HERE ============ -->
+  <h2>What isn't on this page, and why</h2>
+  <p class="section-note">Gaps are shown as gaps — the same rule the rest of the module runs on.</p>
+
+  <div class="method">
+    <ul class="gap-list">
+      <li><strong>Segment detail (Probe Cards / Systems).</strong> Not disclosed in the earnings release —
+        FormFactor reports segments only in the 10-Q/10-K footnote. Figures circulating from the earnings
+        call are secondary-source and are <strong>deliberately excluded</strong>. The
+        Corporate/unallocated reconciling line — the one that carries the restructuring in the Phase 2
+        bridge — arrives with the 10-Q.</li>
+      <li><strong>An exact tariff-refund amount.</strong> Management described refunds of tariffs paid from
+        2025 into early 2026 but did not size them for Q2. Not estimated here.</li>
+      <li><strong>A reconciliation note on the restructuring figures.</strong> The release gives a
+        cost-of-revenue impact of $4.292M and an operating-expense impact of $(0.201)M, which sum to
+        $4.091M, while also citing an approximately $4.5M total operating-income impact.
+        <strong>Those do not tie.</strong> This page uses the $4.292M cost-of-revenue figure because that is
+        the line the gross-margin analysis depends on, and flags the discrepancy rather than smoothing it.
+        It should resolve against the 10-Q.</li>
+      <li><strong>Peer comparison.</strong> Not attempted for Q2. Only Teradyne has a comparable calendar-Q2
+        with a fast 10-Q; KLA's June quarter is a fiscal Q4 inside a 10-K; Onto, inTEST and Cohu file later;
+        and Camtek is a foreign private issuer on 20-F/6-K that produces no comparable quarterly GAAP XBRL
+        at all. A complete GAAP peer panel for calendar Q2 is not possible before roughly August 7–10.</li>
+    </ul>
+  </div>
+
+  <!-- ============ 6. METHOD ============ -->
+  <h2>Data &amp; method</h2>
+  <div class="method">
+    <ul>
+      <li><strong>Provenance tiers.</strong> Two tiers appear on this page and are never mixed silently.
+        <em>Filed (XBRL)</em> — Q1 FY2026 comparatives and the $21.5M Q1 restructuring figure, from the
+        10-Q filed 2026-05-05, already in this module's frozen dataset.
+        <em>Announced (not tagged)</em> — all Q2 FY2026 figures, from the earnings release furnished
+        2026-07-29. Unaudited, subject to change in the 10-Q.</li>
+      <li><strong>Why the distinction matters.</strong> An 8-K Item 2.02 exhibit is a real, citable SEC
+        filing — it is simply not machine-readable. The rule this module runs on is not "XBRL or nothing";
+        it is that a reader must never mistake one tier for another. Hence the labelling on every figure.</li>
+      <li><strong>Decomposition.</strong> Revenue effect = Δrevenue × prior-quarter GM%. Margin effect =
+        ΔGM% × current-quarter revenue. The two sum exactly to the change in gross profit. Identical to
+        the method used on the Phase 2 margins page.</li>
+      <li><strong>Normalization.</strong> Gross margin ex-restructuring adds the disclosed
+        cost-of-revenue restructuring charge back to gross profit in each quarter and re-divides by that
+        quarter's revenue. It is <strong>not</strong> a non-GAAP measure of the company's, is not
+        comparable to one, and is shown only to isolate a single disclosed item. It excludes nothing else —
+        notably not stock-based compensation or acquisition-related amortization, which the company's
+        non-GAAP measure does exclude.</li>
+      <li><strong>What is not estimated.</strong> Price, volume, mix, utilization, and the tariff-refund
+        amount are not separately disclosed and are not modelled. The residual is reported as a residual.</li>
+      <li><strong>Rounding.</strong> The walk components sum to $44.13M against a $44.13M change in gross
+        profit; small differences are rounding on margin percentages carried to two decimals.</li>
+      <li><strong>Source.</strong> FormFactor, Inc. Q2 FY2026 earnings release, furnished 2026-07-29 —
+        <a href="https://investors.formfactor.com/news-releases/news-release-details/formfactor-inc-reports-2026-second-quarter-results">investors.formfactor.com</a>.
+        Q1 FY2026 figures from the Q1 10-Q via SEC EDGAR XBRL <code>companyfacts</code>, FormFactor
+        CIK 0001039399, frozen in this repository as of 2026-07-21.</li>
+    </ul>
+  </div>
+
+  <p class="disclosure">
+    Built from public SEC filings and a public earnings release. Q2 FY2026 figures are unaudited and not
+    XBRL-tagged; Phases 1–3 remain frozen as of 2026-07-21. Independent portfolio project — not affiliated
+    with, endorsed by, or based on any non-public information from FormFactor or any company shown.
+    Not investment advice.
+  </p>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script>
+/* ==========================================================================
+   CASCADIA_DATA — frozen values inlined at author time. No network calls at
+   runtime. Q2 values are ANNOUNCED (press release), Q1 values are FILED (XBRL).
+   ========================================================================== */
+var CASCADIA_DATA = {
+  q1: { label: "Q1 FY26", revenue: 226.144, gross_profit: 86.79,  gm: 38.38, restr_cogs: 21.500, gm_nongaap: 49.0 },
+  q2: { label: "Q2 FY26", revenue: 258.200, gross_profit: 130.922, gm: 50.71, restr_cogs: 4.292, gm_nongaap: 53.3 },
+  walk: { revenue_effect: 12.30, margin_effect: 31.83, total: 44.13 },
+  normalized: { q1: 47.89, q2: 52.37 }
+};
+/* ========================================================================== */
+
+(function () {
+  if (typeof echarts === "undefined") {
+    document.getElementById("c1fb").hidden = false;
+    document.getElementById("c2fb").hidden = false;
+    return;
+  }
+  var css  = getComputedStyle(document.documentElement);
+  var tok  = function (n) { return css.getPropertyValue(n).trim(); };
+  var INK2 = tok("--ink-2"), MUTED = tok("--muted"), GRID = tok("--grid"),
+      BASE = tok("--baseline"), S1 = tok("--s1"), S2 = tok("--s2"), S3 = tok("--s3"),
+      SURF = tok("--surface");
+
+  var axisCommon = {
+    axisLine:  { lineStyle: { color: BASE } },
+    axisTick:  { show: false },
+    axisLabel: { color: MUTED, fontSize: 11 }
+  };
+  var D = CASCADIA_DATA;
+
+  /* ---- Chart 1: gross-profit bridge (waterfall) ------------------------- */
+  var base = [0, D.q1.gross_profit, D.q1.gross_profit + D.walk.revenue_effect, 0];
+  var vals = [D.q1.gross_profit, D.walk.revenue_effect, D.walk.margin_effect, D.q2.gross_profit];
+  var cats = ["Q1 FY26\ngross profit", "Revenue\neffect", "Margin\neffect", "Q2 FY26\ngross profit"];
+  var colr = [BASE, S1, S2, BASE];
+
+  var c1 = echarts.init(document.getElementById("c1"), null, { renderer: "svg" });
+  c1.setOption({
+    backgroundColor: SURF,
+    grid: { left: 46, right: 16, top: 26, bottom: 44 },
+    tooltip: {
+      trigger: "axis", axisPointer: { type: "none" },
+      formatter: function (p) {
+        var i = p[0].dataIndex;
+        var isTotal = (i === 0 || i === 3);
+        var v = vals[i];
+        return "<strong>" + cats[i].replace("\n", " ") + "</strong><br>" +
+               (isTotal ? "" : (v >= 0 ? "+" : "")) + "$" + v.toFixed(2) + "M" +
+               (isTotal ? "" : "<br><span style='color:" + MUTED + "'>contribution to the change</span>");
+      }
+    },
+    xAxis: Object.assign({ type: "category", data: cats }, axisCommon,
+      { axisLabel: { color: INK2, fontSize: 11, lineHeight: 14, interval: 0 } }),
+    yAxis: Object.assign({ type: "value", name: "$M", nameTextStyle: { color: MUTED, fontSize: 11 },
+      splitLine: { lineStyle: { color: GRID } } }, axisCommon),
+    series: [
+      { name: "base", type: "bar", stack: "w", silent: true,
+        itemStyle: { color: "transparent" }, emphasis: { disabled: true }, data: base },
+      { name: "value", type: "bar", stack: "w", barWidth: "46%",
+        itemStyle: {
+          borderRadius: [4, 4, 0, 0],
+          color: function (p) { return colr[p.dataIndex]; }
+        },
+        label: {
+          show: true, position: "top", fontSize: 11.5, fontWeight: 600, color: INK2,
+          formatter: function (p) {
+            var i = p.dataIndex;
+            return (i === 0 || i === 3 ? "" : "+") + "$" + vals[i].toFixed(1) + "M";
+          }
+        },
+        data: vals }
+    ]
+  });
+
+  /* ---- Chart 2: three margin bases (slope) -------------------------------
+     Only the right end is labelled, and each label carries the series name plus
+     its change in points — identity is never color-alone (the magenta slot is
+     below 3:1 on this surface and the magenta/blue pair sits in the tritan warn
+     band, so direct labels are required relief). Per-point values are omitted
+     deliberately: the three Q2 endpoints are within 2.6 points of each other and
+     would collide. Exact values live in the table view below. The dy offsets are
+     fixed, not automatic, so the labels cannot overlap at any width. */
+  var xs = [D.q1.label, D.q2.label];
+  var mk = function (name, color, data, dy) {
+    return {
+      name: name, type: "line", data: data, symbol: "circle", symbolSize: 9,
+      lineStyle: { width: 2, color: color },
+      itemStyle: { color: color, borderColor: SURF, borderWidth: 2 },
+      label: { show: false },
+      endLabel: {
+        show: true, distance: 10, offset: [0, dy], fontSize: 11, fontWeight: 600,
+        color: INK2,
+        formatter: function () {
+          var d = data[1] - data[0];
+          return name + "  " + (d >= 0 ? "+" : "") + d.toFixed(1) + " pts";
+        }
+      }
+    };
+  };
+  var c2 = echarts.init(document.getElementById("c2"), null, { renderer: "svg" });
+  c2.setOption({
+    backgroundColor: SURF,
+    grid: { left: 44, right: 132, top: 26, bottom: 40 },
+    legend: {
+      show: true, bottom: 0, itemWidth: 14, itemHeight: 8, icon: "roundRect",
+      textStyle: { color: INK2, fontSize: 11 }
+    },
+    tooltip: {
+      trigger: "axis",
+      axisPointer: { type: "line", lineStyle: { color: BASE, width: 1 } },
+      valueFormatter: function (v) { return v.toFixed(1) + "%"; }
+    },
+    xAxis: Object.assign({ type: "category", boundaryGap: false, data: xs }, axisCommon,
+      { axisLabel: { color: INK2, fontSize: 11 } }),
+    yAxis: Object.assign({ type: "value", min: 36, max: 56, interval: 5,
+      axisLabel: { color: MUTED, fontSize: 11, formatter: "{value}%" },
+      splitLine: { lineStyle: { color: GRID } } }, axisCommon),
+    series: [
+      mk("GAAP", S1, [D.q1.gm, D.q2.gm], 4),
+      mk("ex-restr.", S2, [D.normalized.q1, D.normalized.q2], 1),
+      mk("non-GAAP", S3, [D.q1.gm_nongaap, D.q2.gm_nongaap], -7)
+    ]
+  });
+
+  var ro = new ResizeObserver(function () { c1.resize(); c2.resize(); });
+  ro.observe(document.getElementById("c1"));
+  ro.observe(document.getElementById("c2"));
+})();
+</script>
+</body>
+</html>
