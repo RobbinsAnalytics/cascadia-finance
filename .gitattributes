@@ -1,0 +1,28 @@
+# Line endings: normalized to LF in the repository and on checkout.
+#
+# Windows tooling rewrites these files with CRLF, which showed 30 files as
+# modified when nothing had changed — including data/raw/ and data/conformed/,
+# which ARE the data freeze. Line-ending churn on the freeze is not cosmetic:
+# it makes "the frozen snapshot is untouched" impossible to assert by hash, and
+# would cause the freeze-integrity check in the Q2 filed build to fail on every
+# run for a reason that has nothing to do with the data.
+#
+# Every blob in HEAD is already LF, so this is a policy declaration and not a
+# rewrite: git normalizes on the way into the index and the phantom diffs stop
+# appearing. No renormalization commit is needed.
+
+* text=auto eol=lf
+
+# Binaries: never examined for line endings, never normalized.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.pdf  binary
+*.woff binary
+*.woff2 binary
+*.db   binary
+*.sqlite binary
+*.zip  binary
+*.gz   binary
