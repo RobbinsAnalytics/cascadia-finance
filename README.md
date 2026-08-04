@@ -71,6 +71,13 @@ facts (absent from `companyfacts`) from FORM's filing XBRL instances, and
 `python src/ingest_peers.py` pulls the six peer `companyfacts` bundles — both at
 the same displayed as-of date, with the actual retrieval date recorded.
 
+A third freeze extension is specified but not yet built: the Q2 FY2026 **filed**
+page, which adds the 10-Q XBRL figures and compares them against the July 29
+press-release numbers already published on the read-through page. It refreshes
+nothing — Phase 1–3 stay frozen at 2026-07-21, and a freeze-integrity check
+hashes `data/raw/` and `data/conformed/` against `HEAD` to prove it. The runbook
+is `.claude/skills/q2-filed-build/SKILL.md`.
+
 ## Data citation
 
 U.S. Securities and Exchange Commission, EDGAR XBRL APIs
