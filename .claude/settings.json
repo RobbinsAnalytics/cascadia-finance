@@ -14,7 +14,8 @@
       "Bash(git add*)",
       "Bash(git commit*)",
       "Bash(gh run*)",
-      "Bash(python src/validate*.py)"
+      "Bash(python src/validate*.py)",
+      "Bash(python src/check_peer_filings.py*)"
     ],
     "ask": [
       "Bash(git push*)",
