@@ -48,11 +48,34 @@ protected_paths = [
   "docs/peers.html",
 
   # The announced tier of the Q2 comparison. Its figures are the other half of
-  # the reconciliation and must stay exactly as published. Its one permitted
-  # non-numeric edit — a cross-link to the filed page — was used on 2026-08-05
-  # in commit 4127468. There is no second one.
+  # the reconciliation and must stay exactly as published.
   "docs/q2-readthrough.html",
 ]
+
+# ---------------------------------------------------------------------------
+# Authorized non-numeric edits to frozen pages
+#
+# 2026-08-05 — cross-link. docs/q2-readthrough.html gained a link to the filed
+#   page (commit 4127468), the single edit its build runbook permitted.
+#
+# 2026-08-05 — navigation. Aaron authorized a nav-only edit to every frozen
+#   report: a kicker linking back to the portfolio home and the Finance case
+#   study, on the canonical domain. Four reports previously dead-ended, and
+#   three of them pointed at the non-canonical github.io address.
+#
+#   The data freeze is untouched by this. as_of_date stays 2026-07-21, nothing
+#   was re-pulled, and no figure, label or flag changed — the diff is seven
+#   added and three removed lines, all anchor tags. The claim the module makes
+#   out loud is about the data, and it stays literally true.
+#
+#   These are NOT recorded as permitted_edit entries below. Under
+#   baseline = "HEAD" an exemption would remove the page from checking
+#   permanently, which is weaker than the gate is today, in exchange for
+#   nothing: once the edit is committed the page is unchanged-vs-HEAD again and
+#   the gate passes on its own. Exemptions earn their keep only when baseline
+#   moves to the freeze SHA. Recording the authorization here instead keeps the
+#   decision auditable without loosening the control.
+# ---------------------------------------------------------------------------
 
 # No active exemptions. Under baseline = "HEAD" every protected path above is
 # checked; declaring one here would EXEMPT it, which is weaker than the current

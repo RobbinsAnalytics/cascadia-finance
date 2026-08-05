@@ -28,9 +28,13 @@ paths. It is read by `src/validate_freeze.py` *and* by check 5 of
 Two copies of that list is how they drift apart unnoticed; that is why the
 hardcoded `frozen_paths()` was removed.
 
-**`docs/q2-readthrough.html` has spent its one permitted edit** — a non-numeric
-cross-link to the filed page, commit `4127468`. Its announced figures are the
-other half of the reconciliation. There is no second permitted edit.
+**Edits to frozen pages are authorized one at a time, and only non-numeric
+ones.** Two have been authorized so far: the `q2-readthrough.html` cross-link
+(commit `4127468`) and the 2026-08-05 back-navigation kicker across all five
+reports. Both are recorded with their reasoning at the bottom of
+`governance/freeze.toml`. The announced figures on `q2-readthrough.html` are
+the other half of the reconciliation — nothing numeric on any frozen page
+changes without Aaron deciding to advance the freeze itself.
 
 ## Publishing
 
