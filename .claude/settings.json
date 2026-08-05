@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git show*)",
+      "Bash(git fetch*)",
+      "Bash(git rev-parse*)",
+      "Bash(git rev-list*)",
+      "Bash(git branch*)",
+      "Bash(git restore*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(gh run*)",
+      "Bash(python src/validate*.py)"
+    ],
+    "ask": [
+      "Bash(git push*)",
+      "Bash(git reset --hard*)",
+      "Bash(git rebase*)"
+    ],
+    "deny": [
+      "Bash(git push*--force*)",
+      "Bash(git push*-f *)",
+      "Bash(git add -A*)",
+      "Bash(git add .)",
+      "Bash(git add . *)"
+    ]
+  },
+  "defaultMode": "acceptEdits",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"${CLAUDE_PROJECT_DIR}/.claude/hooks/no_whitespace_commits.py\""
+          }
+        ]
+      }
+    ]
+  }
+}

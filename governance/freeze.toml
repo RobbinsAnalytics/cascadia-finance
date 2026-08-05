@@ -1,0 +1,59 @@
+# Cascadia Semiconductors — the freeze, as data.
+#
+# Read by src/validate_freeze.py (cascadia-standards template v1.0.0, copied
+# verbatim — never edit that script here). This file is the authoritative
+# "do not touch" list; it replaces the hardcoded frozen_paths() that used to
+# live inside src/validate_q2_filed.py.
+
+[freeze]
+module = "cascadia-semiconductors"
+
+# Phases 1-3 were pulled from SEC EDGAR on this date and have not been re-pulled
+# since. The date is stamped on every page and stated in interviews — advancing
+# it is a deliberate decision, never a side effect of a build.
+as_of_date = "2026-07-21"
+
+# "Unchanged since the last commit." This is the behaviour the Q2 filed build
+# validated under, preserved exactly.
+#
+# The stronger setting is the SHA of the freeze commit itself, which would
+# verify the as-of claim across the repo's whole history rather than only since
+# the last commit. Switching to it requires declaring the legitimate
+# post-freeze changes below as permitted_edit entries — notably the
+# q2-readthrough.html cross-link (commit 4127468). Worth doing deliberately;
+# not worth doing as a side effect of adopting the template.
+baseline = "HEAD"
+
+# Everything Phases 1-3 produced. The Q2 extension's own outputs are absent on
+# purpose: data/raw/q2filed_*, data/raw/announced_q2_fy2026.json,
+# data/conformed/fact_q2_filed.csv and docs/q2-filed.html are new files this
+# build owns and may rewrite.
+protected_paths = [
+  # Raw EDGAR responses — the snapshot itself.
+  "data/raw/manifest.json",
+  "data/raw/companyfacts_*.json",
+  "data/raw/segments_FORM_*.json",
+  "data/raw/segments_manifest_FORM.json",
+  "data/raw/peers_manifest.json",
+
+  # Conformed outputs built from that snapshot.
+  "data/conformed/fact_financials_quarterly.csv",
+  "data/conformed/fact_segments_quarterly.csv",
+  "data/conformed/fact_peers_quarterly.csv",
+
+  # Published pages. src/build_pages.py rewrites the first three together, so
+  # it must never be invoked unscoped during an extension.
+  "docs/index.html",
+  "docs/margins.html",
+  "docs/peers.html",
+
+  # The announced tier of the Q2 comparison. Its figures are the other half of
+  # the reconciliation and must stay exactly as published. Its one permitted
+  # non-numeric edit — a cross-link to the filed page — was used on 2026-08-05
+  # in commit 4127468. There is no second one.
+  "docs/q2-readthrough.html",
+]
+
+# No active exemptions. Under baseline = "HEAD" every protected path above is
+# checked; declaring one here would EXEMPT it, which is weaker than the current
+# gate. Exemptions become useful when baseline moves to the freeze SHA.

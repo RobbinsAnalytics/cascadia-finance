@@ -26,12 +26,20 @@ Usage:
 """
 
 import csv
-import glob
 import json
-import subprocess
 import sys
 from datetime import date
 from pathlib import Path
+
+from validate_freeze import git_ok, load_protected
+
+# The Windows console defaults to cp1252 and cannot encode the minus sign in
+# the crossfoot check's name. That crashed this script with UnicodeEncodeError
+# *after* every check had passed and the report had been written — exit 1, i.e.
+# "publish nothing", for a formatting reason. The verdict must never depend on
+# what the terminal can render.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 RAW = REPO_ROOT / "data" / "raw"
@@ -40,27 +48,19 @@ REPORT = REPO_ROOT / "governance" / "validation_report_q2_filed.md"
 
 USD_TOL = 2_000
 
-# Everything this build must NOT have altered (checked vs git HEAD).
+# The protected-path list used to be hardcoded here. It now lives in
+# governance/freeze.toml, read through the shared cascadia-standards gate, so
+# there is exactly one authoritative answer to "what is frozen?" — two copies
+# of that list is how they drift apart without anyone noticing.
 def frozen_paths():
-    paths = ["data/raw/manifest.json", "data/raw/segments_manifest_FORM.json",
-             "data/raw/peers_manifest.json",
-             "data/conformed/fact_financials_quarterly.csv",
-             "data/conformed/fact_segments_quarterly.csv",
-             "data/conformed/fact_peers_quarterly.csv",
-             "docs/index.html", "docs/margins.html", "docs/peers.html",
-             "docs/q2-readthrough.html"]
-    for p in sorted(glob.glob(str(RAW / "companyfacts_*.json"))):
-        paths.append(str(Path(p).relative_to(REPO_ROOT)).replace("\\", "/"))
-    for p in sorted(glob.glob(str(RAW / "segments_FORM_*.json"))):
-        paths.append(str(Path(p).relative_to(REPO_ROOT)).replace("\\", "/"))
+    paths, baseline = load_protected(REPO_ROOT)
     return paths
 
 
 def git_unchanged(path: str) -> bool:
-    """True if `path` is byte-identical to HEAD (git, line-ending-aware)."""
-    r = subprocess.run(["git", "diff", "--quiet", "HEAD", "--", path],
-                       cwd=REPO_ROOT, capture_output=True)
-    return r.returncode == 0
+    """True if `path` is byte-identical to the freeze baseline (line-ending-aware)."""
+    _, baseline = load_protected(REPO_ROOT)
+    return git_ok(REPO_ROOT, "diff", "--quiet", baseline, "--", path)
 
 
 def frozen_q1_revenue():
