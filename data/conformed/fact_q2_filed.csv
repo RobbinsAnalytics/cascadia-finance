@@ -1,0 +1,13 @@
+line,basis,unit,announced,filed,abs_variance,pct_variance,bps_variance,flag
+Revenue,GAAP,USD,258242000,258242000,0,0.0,,match
+Cost of revenue,GAAP,USD,127320000,127320000,0,0.0,,match
+Gross profit,GAAP,USD,130922000,130922000,0,0.0,,match
+Gross margin,GAAP,pct,50.7,50.7,0.0,0.0,0.0,match
+R&D expense,GAAP,USD,31099000,31099000,0,0.0,,match
+SG&A expense,GAAP,USD,37165000,37165000,0,0.0,,match
+Total operating expenses,GAAP,USD,73123000,73123000,0,0.0,,match
+Operating income,GAAP,USD,57799000,57799000,0,0.0,,match
+Net income,GAAP,USD,56207000,56207000,0,0.0,,match
+Diluted EPS,GAAP,USD/shares,0.71,0.71,0.0,0.0,,match
+Restructuring in cost of revenue,GAAP,USD,4292000,4292000,0,0.0,,match
+Gross margin,non-GAAP,pct,53.3,,,,,not_comparable

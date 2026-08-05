@@ -1,0 +1,11 @@
+{
+  "as_of_date": "2026-08-05",
+  "note": "Q2 FY2026 filed build \u2014 a freeze EXTENSION. The Phase 1-3 dataset (frozen 2026-07-21) was NOT refreshed or re-stamped.",
+  "tenq_accession": "0001039399-26-000033",
+  "tenq_instance": "https://www.sec.gov/Archives/edgar/data/1039399/000103939926000033/form-20260627_htm.xml",
+  "tenq_filed": "2026-08-04",
+  "tenq_bytes": 1725503,
+  "eightk_accession": "0001039399-26-000030",
+  "eightk_exhibit": "https://www.sec.gov/Archives/edgar/data/1039399/000103939926000030/ex9901-earningsreleasexq226.htm",
+  "eightk_furnished": "2026-07-29"
+}

@@ -1,0 +1,22 @@
+{
+ "tier": "announced",
+ "source": "SEC EDGAR 8-K Item 2.02 EX-99.1 earnings release",
+ "accession": "0001039399-26-000030",
+ "furnished": "2026-07-29",
+ "exhibit_url": "https://www.sec.gov/Archives/edgar/data/1039399/000103939926000030/ex9901-earningsreleasexq226.htm",
+ "unit_note": "USD (dollars); margins in percent; EPS in USD/share",
+ "figures": {
+  "revenue": 258242000,
+  "cost_of_revenue": 127320000,
+  "gross_profit": 130922000,
+  "rnd_expense": 31099000,
+  "sgna_expense": 37165000,
+  "opex_total": 73123000,
+  "operating_income": 57799000,
+  "net_income": 56207000,
+  "eps_diluted": 0.71,
+  "gaap_gross_margin_pct": 50.7,
+  "nongaap_gross_margin_pct": 53.3,
+  "restructuring_cogs": 4292000
+ }
+}

@@ -1,0 +1,79 @@
+{
+ "ticker": "FORM",
+ "cik": "0001039399",
+ "fiscal_period": "2026Q2",
+ "period_start": "2026-03-29",
+ "period_end": "2026-06-27",
+ "source": "SEC EDGAR 10-Q XBRL instance",
+ "accession": "0001039399-26-000033",
+ "instance_url": "https://www.sec.gov/Archives/edgar/data/1039399/000103939926000033/form-20260627_htm.xml",
+ "ytd_revenue": 484386000,
+ "facts": {
+  "revenue": {
+   "label": "Revenue (GAAP)",
+   "tag": "RevenueFromContractWithCustomerExcludingAssessedTax",
+   "unit": "USD",
+   "value": 258242000
+  },
+  "cost_of_revenue": {
+   "label": "Cost of Revenue (GAAP)",
+   "tag": "CostOfGoodsAndServicesSold",
+   "unit": "USD",
+   "value": 127320000
+  },
+  "gross_profit": {
+   "label": "Gross Profit (GAAP)",
+   "tag": "GrossProfit",
+   "unit": "USD",
+   "value": 130922000
+  },
+  "rnd_expense": {
+   "label": "R&D Expense (GAAP)",
+   "tag": "ResearchAndDevelopmentExpense",
+   "unit": "USD",
+   "value": 31099000
+  },
+  "sgna_expense": {
+   "label": "SG&A Expense (GAAP)",
+   "tag": "SellingGeneralAndAdministrativeExpense",
+   "unit": "USD",
+   "value": 37165000
+  },
+  "opex_total": {
+   "label": "Total Operating Expenses (GAAP)",
+   "tag": "OperatingExpenses",
+   "unit": "USD",
+   "value": 73123000
+  },
+  "operating_income": {
+   "label": "Operating Income (GAAP)",
+   "tag": "OperatingIncomeLoss",
+   "unit": "USD",
+   "value": 57799000
+  },
+  "net_income": {
+   "label": "Net Income (GAAP)",
+   "tag": "NetIncomeLoss",
+   "unit": "USD",
+   "value": 56207000
+  },
+  "eps_diluted": {
+   "label": "Diluted EPS (GAAP)",
+   "tag": "EarningsPerShareDiluted",
+   "unit": "USD/shares",
+   "value": 0.71
+  },
+  "restructuring_total": {
+   "label": "Restructuring charges \u2014 total (GAAP)",
+   "tag": "RestructuringCharges",
+   "unit": "USD",
+   "value": 4493000
+  },
+  "restructuring_cogs": {
+   "label": "Restructuring in cost of revenue (GAAP)",
+   "tag": "RestructuringCharges@StatementOfIncomeLocationBalanceAxis=CostOfGoodsAndServicesSold",
+   "unit": "USD",
+   "value": 4292000
+  }
+ }
+}

@@ -1,0 +1,281 @@
+<!doctype html>
+<!-- ==========================================================================
+     Cascadia Finance — Q2 FY2026 Filed (announced-vs-filed reconciliation)
+     ------------------------------------------------------------------------
+     MAINTAINER NOTE. This page is a FREEZE EXTENSION built by the q2-filed-build
+     skill. All numbers are inlined between the CASCADIA_Q2 markers by
+     src/conform_q2_filed.py — nothing on this page is hand-typed. Filed values
+     come from the Q2 10-Q XBRL (accession 0001039399-26-000033); announced
+     values from the 8-K EX-99.1 (accession 0001039399-26-000030). Phases 1-3
+     remain frozen as-of 2026-07-21 and were not refreshed. No CDN / no chart
+     library: the comparison is tabular, and the walk is inline SVG.
+     ========================================================================== -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cascadia Finance — FormFactor Q2 FY2026 Filed vs Announced</title>
+<link rel="stylesheet" href="assets/cascadia.css">
+<style>
+  /* Additive only — reuses cascadia.css tokens, mirrors the read-through page. */
+  .tier { border-radius: 10px; padding: 14px 18px; margin: 18px 0 6px; font-size: 13.5px; color: var(--ink-2); }
+  .tier.filed    { background: #eef6ee; border: 1px solid #bfe0bf; border-left: 5px solid var(--up-ink); }
+  .tier .badge { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .09em;
+    text-transform: uppercase; border-radius: 5px; padding: 3px 9px; margin-bottom: 8px; }
+  .badge.filed    { color: #14521a; background: #d8ecd8; }
+  .badge.announced{ color: #7a5200; background: #f5e6c4; }
+  .tier p { margin: 0 0 7px; max-width: 86ch; } .tier p:last-child { margin-bottom: 0; }
+  .tier strong { color: var(--ink); }
+  .src { font-size: 11px; color: var(--muted); font-weight: 500; }
+  .kpi .src { display: block; margin-top: 6px; }
+
+  .result { border-radius: 10px; padding: 16px 18px; margin: 14px 0; font-size: 14.5px;
+    background: var(--surface); border: 1px solid var(--ring); border-left: 5px solid var(--s1); }
+  .result strong { color: var(--ink); }
+
+  table.dt { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; margin-top: 10px; }
+  table.dt th, table.dt td { text-align: right; padding: 7px 10px; border-bottom: 1px solid var(--grid); }
+  table.dt th:first-child, table.dt td:first-child { text-align: left; }
+  table.dt thead th { color: var(--ink-2); font-weight: 600; border-bottom: 1px solid var(--baseline); }
+  table.dt tbody tr:last-child td { border-bottom: none; }
+  .flag { font-size: 11px; font-weight: 700; border-radius: 5px; padding: 2px 8px; letter-spacing: .03em; }
+  .flag.match { color: var(--up-ink); background: var(--up-bg); }
+  .flag.differs { color: var(--down-ink); background: var(--down-bg); }
+  .flag.not_comparable { color: var(--flat-ink); background: var(--flat-bg); }
+  .tablewrap { background: var(--surface); border: 1px solid var(--ring); border-radius: 10px; padding: 6px 18px 12px; margin-top: 14px; }
+  .tablewrap h3 { font-size: 14px; font-weight: 650; margin: 12px 0 0; }
+  .tablewrap .chart-sub { font-size: 12px; color: var(--muted); margin: 1px 0 2px; }
+  .method code { overflow-wrap: anywhere; }
+  #walk svg { max-width: 100%; height: auto; display: block; }
+</style>
+</head>
+<body>
+
+<!--CASCADIA_Q2_START-->
+<script id="cascadia-q2" type="application/json">
+{"as_of_frozen":"2026-07-21","as_of_filed":"2026-08-05","tenq_accession":"0001039399-26-000033","tenq_filed":"2026-08-04","eightk_accession":"0001039399-26-000030","eightk_furnished":"2026-07-29","headline_result":"match","q1":{"revenue":226.144,"gross_profit":86.794,"gm":38.38,"operating_income":16.648,"net_income":20.384,"eps":0.26},"q2":{"revenue":258.242,"cost_of_revenue":127.32,"gross_profit":130.922,"gm":50.7,"rnd":31.099,"sgna":37.165,"opex":73.123,"operating_income":57.799,"net_income":56.207,"eps":0.71,"restr_cogs":4.292,"restr_total":4.493,"restr_opex_net":0.201,"nongaap_gm":53.3},"compare":[{"line":"Revenue","basis":"GAAP","unit":"USD","announced":258.24199999999996,"filed":258.24199999999996,"flag":"match","bps":"","absM":0.0},{"line":"Cost of revenue","basis":"GAAP","unit":"USD","announced":127.32,"filed":127.32,"flag":"match","bps":"","absM":0.0},{"line":"Gross profit","basis":"GAAP","unit":"USD","announced":130.922,"filed":130.922,"flag":"match","bps":"","absM":0.0},{"line":"Gross margin","basis":"GAAP","unit":"pct","announced":50.7,"filed":50.7,"flag":"match","bps":0.0,"absM":0.0},{"line":"R&D expense","basis":"GAAP","unit":"USD","announced":31.099,"filed":31.099,"flag":"match","bps":"","absM":0.0},{"line":"SG&A expense","basis":"GAAP","unit":"USD","announced":37.165,"filed":37.165,"flag":"match","bps":"","absM":0.0},{"line":"Total operating expenses","basis":"GAAP","unit":"USD","announced":73.12299999999999,"filed":73.12299999999999,"flag":"match","bps":"","absM":0.0},{"line":"Operating income","basis":"GAAP","unit":"USD","announced":57.799,"filed":57.799,"flag":"match","bps":"","absM":0.0},{"line":"Net income","basis":"GAAP","unit":"USD","announced":56.207,"filed":56.207,"flag":"match","bps":"","absM":0.0},{"line":"Diluted EPS","basis":"GAAP","unit":"USD/shares","announced":0.71,"filed":0.71,"flag":"match","bps":"","absM":0.0},{"line":"Restructuring in cost of revenue","basis":"GAAP","unit":"USD","announced":4.292,"filed":4.292,"flag":"match","bps":"","absM":0.0},{"line":"Gross margin","basis":"non-GAAP","unit":"pct","announced":53.3,"filed":"","flag":"not_comparable","bps":"","absM":""}],"walk":{"revenue_effect":12.32,"margin_effect":31.82,"total":44.13},"restructuring":{"cogs":4.292,"total":4.493,"opex_net":0.201}}
+</script>
+<!--CASCADIA_Q2_END-->
+
+<div class="wrap">
+
+  <header class="site-head">
+    <p class="kicker">
+      <a href="index.html">← Executive pack (Phase 1)</a> ·
+      <a href="margins.html">Margins &amp; segments (Phase 2)</a> ·
+      <a href="peers.html">Peer benchmark (Phase 3)</a> ·
+      <a href="q2-readthrough.html">Q2 read-through (announced)</a>
+    </p>
+    <h1>FormFactor (NASDAQ: FORM) — Q2 FY2026 Filed vs Announced</h1>
+    <p class="subtitle">The Q2 10-Q has filed. The read-through pre-committed to replacing itself with a
+      reconciliation of the <em>announced</em> press-release figures against the <em>filed</em> XBRL — published
+      whichever way it came out. This is that reconciliation.</p>
+    <span class="asof" id="asof">…</span>
+  </header>
+
+  <div class="tier filed">
+    <span class="badge filed">Filed — 10-Q XBRL</span>
+    <p><strong>These Q2 FY2026 figures are now filed, tagged XBRL facts</strong>, extracted from FormFactor's
+      Q2 10-Q (<span id="p-tenq"></span>) — the quarter ended 2026-06-27. They are compared here against the
+      <em>announced</em> figures from the Q2 earnings release (8-K Item&nbsp;2.02 EX-99.1, <span id="p-8k"></span>).</p>
+    <p><strong>Phases 1–3 remain frozen as-of 2026-07-21 and were not refreshed by this build.</strong> This page is a
+      freeze <em>extension</em> — new files only, its own as-of date. No existing series was re-pulled or re-stamped;
+      a structural freeze-integrity check in <code>validate_q2_filed.py</code> verifies it.</p>
+  </div>
+
+  <div class="result" id="result">…</div>
+
+  <!-- headline filed KPIs, QoQ vs frozen Q1 -->
+  <h2>Q2 FY2026 as filed</h2>
+  <p class="section-note">GAAP, from the 10-Q XBRL. Sequential change vs the frozen Q1 FY2026 series (also XBRL).</p>
+  <div class="kpi-grid" id="kpis"></div>
+
+  <!-- the centrepiece -->
+  <div class="tablewrap">
+    <h3>Announced vs filed — every compared line</h3>
+    <p class="chart-sub">Announced = 8-K EX-99.1 (furnished 2026-07-29). Filed = 10-Q XBRL (filed 2026-08-04).
+      $M except margins (%) and EPS ($/share).</p>
+    <div style="overflow-x:auto;"><table class="dt" id="cmp"></table></div>
+  </div>
+
+  <!-- margin walk on filed figures -->
+  <h2>The gross-profit walk — on filed figures</h2>
+  <p class="section-note">Phase 2 method: Δgross profit splits into a revenue effect (Δrevenue × prior-quarter GM%)
+    and a margin effect (ΔGM% × current revenue). Applied to the <em>filed</em> Q1→Q2 numbers.</p>
+  <div class="chart-card" style="max-width:none;"><div id="walk"></div></div>
+  <ul class="callouts" id="walk-notes"></ul>
+
+  <!-- restructuring resolution -->
+  <h2>What the filing resolved</h2>
+  <p class="section-note">The read-through flagged one open question for the 10-Q. Here is how it landed.</p>
+  <ul class="callouts" id="resolved"></ul>
+
+  <section class="method" aria-label="Data and method">
+    <h2>Data &amp; method</h2>
+    <ul>
+      <li><strong>Two SEC sources, both cited.</strong> <em>Filed</em> — Q2 FY2026 10-Q XBRL instance,
+        accession <span id="m-tenq"></span>, filed 2026-08-04. <em>Announced</em> — Q2 FY2026 8-K Item 2.02 EX-99.1
+        earnings release, accession <span id="m-8k"></span>, furnished 2026-07-29. Both were pulled from EDGAR by
+        <code>src/ingest_q2_filed.py</code>; no figure on this page was hand-entered.</li>
+      <li><strong>GAAP vs non-GAAP asymmetry.</strong> XBRL carries GAAP only. The company's non-GAAP gross margin
+        has no filed counterpart, so it is shown as <code>not_comparable</code> rather than compared — the asymmetry
+        is part of the story, not an omission.</li>
+      <li><strong>Gross margin is computed from filed line items</strong> (filed gross profit ÷ filed revenue), and
+        matched against the release's stated GAAP gross margin. The walk uses the same decomposition as the Phase 2
+        margins page; the two components sum to the change in gross profit, to the rounding.</li>
+      <li><strong>The frozen dataset was not refreshed.</strong> Phases 1–3 stay exactly as frozen 2026-07-21. This
+        build added only new files (<code>q2filed_*</code>, <code>announced_q2_fy2026.json</code>,
+        <code>fact_q2_filed.csv</code>, this page) and appended the two new restructuring tags to
+        <a href="https://github.com/RobbinsAnalytics/cascadia-semiconductors/blob/main/governance/tag_mapping.csv">tag_mapping.csv</a>.
+        A freeze-integrity check (<a href="https://github.com/RobbinsAnalytics/cascadia-semiconductors/blob/main/governance/validation_report_q2_filed.md">validation_report_q2_filed.md</a>)
+        hashes the pre-existing data against git HEAD and fails the build on any change.</li>
+      <li><strong>Source.</strong> SEC EDGAR, FormFactor CIK 0001039399. Q1 comparatives from the frozen Phase 1
+        dataset (Q1 10-Q XBRL).</li>
+    </ul>
+  </section>
+
+  <p class="disclosure">Built from public SEC filings (10-Q XBRL and an 8-K earnings-release exhibit). Phases 1–3
+    remain frozen as-of 2026-07-21. Independent portfolio project — not affiliated with, endorsed by, or based on any
+    non-public information from FormFactor or any company shown. Not investment advice.</p>
+
+</div>
+
+<script>
+"use strict";
+/* Renders entirely from the injected CASCADIA_Q2 payload. No network, no CDN. */
+var D = JSON.parse(document.getElementById("cascadia-q2").textContent);
+
+var fmtM   = function (v) { return v === "" || v == null ? "—" : "$" + Number(v).toFixed(1) + "M"; };
+var fmtPct = function (v) { return v === "" || v == null ? "—" : Number(v).toFixed(2) + "%"; };
+var fmtEps = function (v) { return v === "" || v == null ? "—" : "$" + Number(v).toFixed(2); };
+var signed = function (v, s, d) { d = d == null ? 1 : d; return (v > 0 ? "+" : "") + Number(v).toFixed(d) + s; };
+function chip(txt, dir) { return '<span class="chip ' + dir + '"><span aria-hidden="true">' +
+  (dir === "up" ? "▲" : dir === "down" ? "▼" : "◆") + '</span> ' + txt + '</span>'; }
+function esc(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+
+/* header + provenance stamps */
+document.getElementById("asof").innerHTML =
+  'Filed 10-Q retrieved <strong>' + D.as_of_filed + '</strong> · frozen dataset as-of <strong>' +
+  D.as_of_frozen + '</strong> (unchanged) · GAAP per XBRL; company headline figures may be non-GAAP';
+document.getElementById("p-tenq").textContent = "accession " + D.tenq_accession;
+document.getElementById("p-8k").textContent = "accession " + D.eightk_accession;
+document.getElementById("m-tenq").textContent = D.tenq_accession;
+document.getElementById("m-8k").textContent = D.eightk_accession;
+
+/* result banner */
+(function () {
+  var el = document.getElementById("result");
+  if (D.headline_result === "match") {
+    el.innerHTML = "<strong>Filed matches announced — to the dollar, on every GAAP line.</strong> " +
+      "Revenue, cost of revenue, gross profit, operating expenses, operating income, net income and diluted EPS " +
+      "are identical in the 10-Q XBRL and the earnings release; computed GAAP gross margin ties within rounding. " +
+      "The one non-GAAP line has no XBRL counterpart and is flagged <em>not_comparable</em>. " +
+      "A null result is a real result — the read-through pre-committed to publishing it either way, and this is it.";
+  } else {
+    el.style.borderLeftColor = "var(--down-ink)";
+    el.innerHTML = "<strong>Filed differs from announced on one or more GAAP lines.</strong> " +
+      "See the flagged rows below; differences are documented, not smoothed.";
+  }
+})();
+
+/* KPI cards — Q2 filed, QoQ vs frozen Q1 */
+(function () {
+  var q1 = D.q1, q2 = D.q2;
+  function card(label, value, chipHtml, foot) {
+    return '<div class="kpi"><p class="label">' + label + '</p><p class="value">' + value + '</p>' +
+      '<div class="chips">' + chipHtml + '</div>' + (foot ? '<p class="foot">' + foot + '</p>' : '') +
+      '<span class="src">Filed · 10-Q XBRL</span></div>';
+  }
+  var revPct = (q2.revenue - q1.revenue) / q1.revenue * 100;
+  var oiPct  = (q2.operating_income - q1.operating_income) / Math.abs(q1.operating_income) * 100;
+  document.getElementById("kpis").innerHTML = [
+    card("Revenue (GAAP)", fmtM(q2.revenue), chip(signed(revPct, "%") + ' <span class="tag">QoQ</span>', "up"),
+      "Q1 was " + fmtM(q1.revenue)),
+    card("Gross margin (GAAP)", fmtPct(q2.gm), chip(signed(q2.gm - q1.gm, " pts") + ' <span class="tag">QoQ</span>', "up"),
+      "Gross profit " + fmtM(q2.gross_profit) + " · Q1 was " + fmtPct(q1.gm)),
+    card("Operating income (GAAP)", fmtM(q2.operating_income),
+      chip(signed(oiPct, "%", 0) + ' <span class="tag">QoQ</span>', "up"), "Q1 was " + fmtM(q1.operating_income)),
+    card("Diluted EPS (GAAP)", fmtEps(q2.eps),
+      chip(signed(q2.eps - q1.eps, "", 2) + ' <span class="tag">QoQ</span>', "up"), "Q1 was " + fmtEps(q1.eps)),
+  ].join("");
+})();
+
+/* comparison table */
+(function () {
+  function val(unit, v) { return v === "" ? "—" : unit === "pct" ? fmtPct(v) : unit === "USD/shares" ? fmtEps(v) : fmtM(v); }
+  function variance(r) {
+    if (r.flag === "not_comparable") return "—";
+    if (r.unit === "pct") return (r.bps === "" ? "—" : signed(r.bps, " bps", 1));
+    if (r.absM === "" ) return "—";
+    return r.unit === "USD/shares" ? signed(r.absM, "", 2) : signed(r.absM, "M", 3);
+  }
+  var head = "<thead><tr><th>Line</th><th>Announced <span class='src'>8-K</span></th>" +
+    "<th>Filed <span class='src'>10-Q</span></th><th>Variance</th><th>Basis</th><th>Result</th></tr></thead>";
+  var body = D.compare.map(function (r) {
+    var lbl = esc(r.line) + (r.basis === "non-GAAP" ? ' <span class="src">non-GAAP</span>' : '');
+    return "<tr><td>" + lbl + "</td><td>" + val(r.unit, r.announced) + "</td><td>" + val(r.unit, r.filed) +
+      "</td><td>" + variance(r) + "</td><td>" + r.basis + "</td><td><span class='flag " + r.flag + "'>" +
+      r.flag.replace("_", " ") + "</span></td></tr>";
+  }).join("");
+  document.getElementById("cmp").innerHTML = head + "<tbody>" + body + "</tbody>";
+})();
+
+/* gross-profit walk — inline SVG waterfall (no chart library) */
+(function () {
+  var q1 = D.q1, q2 = D.q2, w = D.walk;
+  var steps = [
+    { label: "Q1 gross profit", base: 0, val: q1.gross_profit, total: true },
+    { label: "Revenue effect", base: q1.gross_profit, val: w.revenue_effect, total: false },
+    { label: "Margin effect", base: q1.gross_profit + w.revenue_effect, val: w.margin_effect, total: false },
+    { label: "Q2 gross profit", base: 0, val: q2.gross_profit, total: true }
+  ];
+  var W = 680, H = 250, padL = 8, padR = 8, padT = 16, padB = 46, n = steps.length;
+  var maxV = q2.gross_profit * 1.12, plotH = H - padT - padB, plotW = W - padL - padR;
+  var bw = plotW / n * 0.56, gap = plotW / n;
+  var css = getComputedStyle(document.documentElement), tok = function (k) { return css.getPropertyValue(k).trim(); };
+  var colTotal = tok("--baseline"), colRev = tok("--s1"), colMar = tok("--s2"), ink = tok("--ink-2"), grid = tok("--grid");
+  function y(v) { return padT + plotH - (v / maxV) * plotH; }
+  var svg = ['<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Gross-profit bridge, Q1 to Q2 FY2026, filed">'];
+  svg.push('<line x1="' + padL + '" y1="' + y(0) + '" x2="' + (W - padR) + '" y2="' + y(0) + '" stroke="' + grid + '"/>');
+  steps.forEach(function (s, i) {
+    var cx = padL + gap * i + (gap - bw) / 2;
+    var top = y(s.base + Math.max(s.val, 0)), bot = y(s.base + Math.min(s.val, 0));
+    var col = s.total ? colTotal : (i === 1 ? colRev : colMar);
+    svg.push('<rect x="' + cx.toFixed(1) + '" y="' + top.toFixed(1) + '" width="' + bw.toFixed(1) +
+      '" height="' + Math.max(2, bot - top).toFixed(1) + '" rx="3" fill="' + col + '"/>');
+    svg.push('<text x="' + (cx + bw / 2).toFixed(1) + '" y="' + (top - 6).toFixed(1) + '" text-anchor="middle" ' +
+      'font-size="12" font-weight="600" fill="' + ink + '">' + (s.total ? "" : "+") + "$" + s.val.toFixed(1) + 'M</text>');
+    s.label.split(" ").forEach(function (word, k) {
+      svg.push('<text x="' + (cx + bw / 2).toFixed(1) + '" y="' + (H - padB + 16 + k * 13) + '" text-anchor="middle" ' +
+        'font-size="11" fill="' + ink + '">' + esc(word) + '</text>');
+    });
+  });
+  svg.push('</svg>');
+  document.getElementById("walk").innerHTML = svg.join("");
+  document.getElementById("walk-notes").innerHTML = [
+    "<li>Gross profit rose <strong>" + signed(w.total, "M") + "</strong>, from " + fmtM(q1.gross_profit) +
+      " to " + fmtM(q2.gross_profit) + " — on the <em>filed</em> figures.</li>",
+    "<li><strong>" + signed(w.revenue_effect, "M") + "</strong> is the revenue effect; <strong>" +
+      signed(w.margin_effect, "M") + "</strong> is the margin effect. They sum to the change, to the rounding.</li>",
+    "<li>This is the mirror of Q1 FY2026, where revenue grew while margin compressed; in Q2 both move up together.</li>"
+  ].join("");
+})();
+
+/* restructuring resolution */
+(function () {
+  var r = D.restructuring;
+  document.getElementById("resolved").innerHTML = [
+    "<li><strong>The restructuring tie-out the read-through flagged is resolved.</strong> The release stated a " +
+      "cost-of-revenue impact of " + fmtM(r.cogs) + " and an operating-expense impact of −$0.2M, which did not " +
+      "sum to its stated ~$4.5M total.</li>",
+    "<li>The filed 10-Q breaks restructuring out by income-statement location: <strong>cost of revenue " +
+      fmtM(r.cogs) + " + operating expenses (net) " + signed(r.opex_net, "M") + " = " + fmtM(r.total) +
+      " total</strong> — which ties. The release's −$0.2M was the operating-expense line shown with the " +
+      "non-GAAP reconciliation's sign; as an actual expense it is " + signed(r.opex_net, "M") + ".</li>",
+    "<li>The cost-of-revenue figure the gross-margin analysis depends on — " + fmtM(r.cogs) +
+      " — is identical announced and filed.</li>"
+  ].join("");
+})();
+</script>
+</body>
+</html>

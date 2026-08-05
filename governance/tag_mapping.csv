@@ -42,3 +42,5 @@ TER,revenue,Revenue (GAAP),Revenues,peer_filed,winning us-gaap tag for this peer
 TER,gross_profit,Gross Profit (GAAP),GrossProfit,peer_filed,winning us-gaap tag for this peer/metric,2026-07-21
 TER,operating_income,Operating Income (GAAP),OperatingIncomeLoss,peer_filed,winning us-gaap tag for this peer/metric,2026-07-21
 TER,rnd_expense,R&D Expense (GAAP),ResearchAndDevelopmentExpenseExcludingAcquiredInProcessCost,peer_filed,winning us-gaap tag for this peer/metric,2026-07-21
+FORM,restructuring_total,Restructuring charges — total (GAAP),RestructuringCharges,q2_filed,Q2 FY2026 filed build; consolidated restructuring total,2026-08-05
+FORM,restructuring_cogs,Restructuring in cost of revenue (GAAP),RestructuringCharges@StatementOfIncomeLocationBalanceAxis=CostOfGoodsAndServicesSold,q2_filed,typed income-statement-location dimension (cost of revenue portion),2026-08-05
