@@ -1,4 +1,4 @@
-# Cascadia Semiconductors
+# Cascadia Finance
 
 **Financial analytics on real SEC filing data — FormFactor (NASDAQ: FORM) and
 semiconductor test & measurement peers.** Part of the
