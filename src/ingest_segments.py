@@ -1,7 +1,7 @@
 """
 ingest_segments.py — Deliberate freeze-EXTENSION: pull FormFactor segment facts.
 
-Cascadia Semiconductors · Phase B (FormFactor segments)
+Cascadia Finance · Phase B (FormFactor segments)
 
 WHY THIS SCRIPT EXISTS (read before running)
 --------------------------------------------

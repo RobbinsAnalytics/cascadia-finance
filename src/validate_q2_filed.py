@@ -1,7 +1,7 @@
 """
 validate_q2_filed.py — publish gate for the Q2 FY2026 filed build (skill step 5/6).
 
-Cascadia Semiconductors · Q2 FY2026 filed-vs-announced
+Cascadia Finance · Q2 FY2026 filed-vs-announced
 
 Writes governance/validation_report_q2_filed.md and exits NON-ZERO on any
 failure. If it fails, publish nothing and commit nothing.

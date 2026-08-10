@@ -1,7 +1,7 @@
 """
 conform_segments.py — Govern FormFactor's segment facts into tidy quarterly data.
 
-Cascadia Semiconductors · Phase B (FormFactor segments)
+Cascadia Finance · Phase B (FormFactor segments)
 
 Input : data/raw/segments_FORM_CIK0001039399.json   (frozen by ingest_segments.py)
 Output: data/conformed/fact_segments_quarterly.csv   (canonical segment hand-off)

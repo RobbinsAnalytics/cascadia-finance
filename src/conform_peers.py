@@ -1,7 +1,7 @@
 """
 conform_peers.py — Govern the peer companyfacts into tidy quarterly data.
 
-Cascadia Semiconductors · Phase 3 (peer benchmark)
+Cascadia Finance · Phase 3 (peer benchmark)
 
 Input : data/raw/companyfacts_<PEER>_CIK*.json  (frozen by ingest_peers.py)
         data/raw/peers_manifest.json

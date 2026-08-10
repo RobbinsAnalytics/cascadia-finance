@@ -1,7 +1,7 @@
 """
 build_db.py — Load the conformed CSV into a SQLite star schema.
 
-Cascadia Semiconductors · Phase A
+Cascadia Finance · Phase A
 
 Input : data/conformed/fact_financials_quarterly.csv
 Output: data/cascadia_semi.db

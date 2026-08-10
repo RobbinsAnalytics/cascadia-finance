@@ -1,7 +1,7 @@
 """
 ingest_peers.py — Phase 3 freeze EXTENSION: pull the US-listed T&M peer bundles.
 
-Cascadia Semiconductors · Phase 3 (peer benchmark)
+Cascadia Finance · Phase 3 (peer benchmark)
 
 WHAT & WHY
 ----------

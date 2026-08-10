@@ -1,7 +1,7 @@
 """
 ingest_q2_filed.py — Q2 FY2026 FILED build (freeze EXTENSION, not a refresh).
 
-Cascadia Semiconductors · Q2 FY2026 filed-vs-announced
+Cascadia Finance · Q2 FY2026 filed-vs-announced
 
 WHAT & WHY  (see .claude/skills/q2-filed-build/SKILL.md — this is step 2 + 3)
 ---------------------------------------------------------------------------

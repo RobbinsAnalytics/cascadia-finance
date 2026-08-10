@@ -1,7 +1,7 @@
 """
 ingest.py — Pull SEC EDGAR XBRL data and freeze it to data/raw/.
 
-Cascadia Semiconductors · Phase A (FormFactor only)
+Cascadia Finance · Phase A (FormFactor only)
 
 What this script does, in order:
   1. Downloads the SEC's ticker → CIK map (company_tickers.json) so CIKs are

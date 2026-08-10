@@ -1,4 +1,4 @@
-# Cascadia Semiconductors — what an agent needs to know
+# Cascadia Finance — what an agent needs to know
 
 FormFactor (NASDAQ: FORM) GAAP financials built from committed SEC EDGAR XBRL,
 published as static HTML from `docs/` to

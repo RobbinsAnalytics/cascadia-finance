@@ -1,7 +1,7 @@
 """
 conform.py — Turn frozen EDGAR snapshots into tidy, governed quarterly data.
 
-Cascadia Semiconductors · Phase A (FormFactor only)
+Cascadia Finance · Phase A (FormFactor only)
 
 Input : data/raw/companyfacts_*.json  (frozen by ingest.py — never re-fetched here)
 Output: data/conformed/fact_financials_quarterly.csv   (canonical hand-off)

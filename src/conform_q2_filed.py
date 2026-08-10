@@ -1,7 +1,7 @@
 """
 conform_q2_filed.py — Q2 FY2026 announced-vs-filed reconciliation.
 
-Cascadia Semiconductors · Q2 FY2026 filed-vs-announced  (skill step 4)
+Cascadia Finance · Q2 FY2026 filed-vs-announced  (skill step 4)
 
 Input : data/raw/q2filed_FORM_CIK0001039399.json   (filed 10-Q XBRL facts)
         data/raw/announced_q2_fy2026.json           (announced 8-K EX-99.1 figures)

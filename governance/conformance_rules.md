@@ -1,4 +1,4 @@
-# Conformance Rules — Cascadia Semiconductors
+# Conformance Rules — Cascadia Finance
 
 These are the rules `src/conform.py` applies when turning raw EDGAR XBRL facts
 into the tidy quarterly dataset. They are stated here so every number on the

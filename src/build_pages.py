@@ -1,7 +1,7 @@
 """
 build_pages.py — Package the conformed data for the static frontend.
 
-Cascadia Semiconductors · Phase A
+Cascadia Finance · Phase A
 
 Input : data/conformed/fact_financials_quarterly.csv
 Output: docs/data/form_quarterly.json      (readable hand-off copy)
