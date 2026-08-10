@@ -2,7 +2,7 @@
 
 FormFactor (NASDAQ: FORM) GAAP financials built from committed SEC EDGAR XBRL,
 published as static HTML from `docs/` to
-`www.robbinsanalytics.com/cascadia-semiconductors/`.
+`www.robbinsanalytics.com/cascadia-finance/`.
 
 Facts that are not inferable from the code, each of which has already cost
 something. Everything else, read `README.md`.
@@ -54,7 +54,7 @@ There is no build step and no Action here — what is committed is what is
 served.
 
 **Surface new pages on the website repo too** (`RobbinsAnalytics.github.io`):
-the case study at `projects/cascadia-semiconductors.qmd` and the Finance card
+the case study at `projects/cascadia-finance.qmd` and the Finance card
 on `index.qmd`. Publish that repo with its own `/publish` skill, from a session
 rooted in it.
 

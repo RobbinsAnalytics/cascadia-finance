@@ -4,7 +4,7 @@
 semiconductor test & measurement peers.** Part of the
 [Cascadia portfolio](https://robbinsanalytics.github.io) by Aaron Robbins.
 
-**Live site:** https://robbinsanalytics.github.io/cascadia-semiconductors/
+**Live site:** https://www.robbinsanalytics.com/cascadia-finance/
 
 An executive-style financial pack — headline → driver → variance — built
 entirely from public SEC EDGAR XBRL filings, with the data-governance

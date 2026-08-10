@@ -146,7 +146,7 @@ Inline the data at build time as the existing pages do. Do not add a CDN call.
 ## 8 · Publish
 
 GitHub Pages serves `docs/` from `main` in this repo, reached at
-`www.robbinsanalytics.com/cascadia-semiconductors/`. Pushing `main` publishes.
+`www.robbinsanalytics.com/cascadia-finance/`. Pushing `main` publishes.
 
 Stage by name — never `git add -A`:
 
@@ -162,7 +162,7 @@ git commit && git push origin main
 ## 9 · Surface it on the website
 
 In `RobbinsAnalytics.github.io`, add a button for the new page to
-`projects/cascadia-semiconductors.qmd` alongside the existing four, and update
+`projects/cascadia-finance.qmd` alongside the existing four, and update
 the read-through bullet to note the filed page now exists. Publish that repo
 with its own `/publish` skill — do not improvise a shorter version.
 
