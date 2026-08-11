@@ -89,6 +89,24 @@ protected_paths = [
 #   the gate passes on its own. Exemptions earn their keep only when baseline
 #   moves to the freeze SHA. Recording the authorization here instead keeps the
 #   decision auditable without loosening the control.
+#
+# 2026-08-10 — social cards. Aaron authorized adding Open Graph and Twitter
+#   card metadata to the four report pages that had none. Only index.html ever
+#   carried them, so sharing margins.html, peers.html, q2-filed.html or
+#   q2-readthrough.html produced no card at all — and all four are linked
+#   directly from the portfolio home and the Finance case study.
+#
+#   Three of the four are protected paths; q2-filed.html is the Q2 build's own
+#   file and is not. Each page gained the same seven tags index.html has always
+#   had — og:type, og:title, og:description, og:image, og:url, twitter:card and
+#   twitter:image — placed in the same position in the head. Head metadata
+#   only: no visible content changed on any page.
+#
+#   The data freeze is untouched. as_of_date stays 2026-07-21, nothing was
+#   re-pulled, and no figure, label or flag changed. The og:description on
+#   q2-readthrough.html names the 8-K earnings release as its source, matching
+#   the announced-tier provenance the page already declares, so the metadata
+#   cannot imply the page is XBRL-derived when it is not.
 # ---------------------------------------------------------------------------
 
 # No active exemptions. Under baseline = "HEAD" every protected path above is
