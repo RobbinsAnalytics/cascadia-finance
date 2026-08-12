@@ -12,8 +12,11 @@
 <meta property="og:url" content="https://www.robbinsanalytics.com/cascadia-finance/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://www.robbinsanalytics.com/cascadia-finance/assets/og-finance.png">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/cascadia.css">
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
+<!-- Local, and after ECharts so registerTheme('cascadia') finds it. -->
+<script src="assets/cascadia-echarts-theme.js"></script>
 </head>
 <body>
 
@@ -220,28 +223,39 @@ document.getElementById("callouts").innerHTML = [
   }
 
   const ink2 = css("--ink-2"), muted = css("--muted"), grid = css("--grid"),
-        baseline = css("--baseline"), s1 = css("--s1"), s2 = css("--s2"), s3 = css("--s3");
+        baseline = css("--baseline"), s1 = css("--s1"), s2 = css("--s2"), s3 = css("--s3"),
+        rain = css("--rain"), ink = css("--ink");
+  /* Rule 2.3.7 — the mark takes the palette value, text takes the ink. */
+  const i1 = css("--ink-s1"), i2 = css("--ink-s2"), i3 = css("--ink-s3");
 
   /* Footnote line appended to tooltips for governance flags. */
   const flagNote = (metric, i) => {
     const f = [];
     if (metric.derived[i]) f.push("‡ Q4 derived = FY − (Q1+Q2+Q3)");
     if (metric.restated[i]) f.push("restated (latest filing wins)");
-    return f.length ? `<div style="color:${muted};font-size:11px;">${f.join(" · ")}</div>` : "";
+    return f.length ? `<div style="color:${muted};font-size:12px;">${f.join(" · ")}</div>` : "";
   };
 
   const base = {
+    /* ECharts' own aria is OFF, deliberately. The theme enables it, but ECharts
+       writes its generated label onto the SAME element cascadiaAccessible()
+       authors, on every render — so the authored L1+L2 label was silently
+       replaced, and what a screen reader actually got was a description of the
+       transparent stacking series: "The 0 series is a Bar chart representing
+       base ... 0, 0, 0, NaN". Worse than no label. The theme's own header says
+       the real access layer is DOM-side; this lets it be. */
+    aria: {enabled: false},
     grid: {left: 8, right: 14, top: 14, bottom: 4, containLabel: true},
     xAxis: {
       type: "category", data: P,
       axisTick: {show: false}, axisLine: {lineStyle: {color: baseline}},
       /* label only fiscal-year starts to keep 33 quarters readable */
-      axisLabel: {color: muted, fontSize: 11,
+      axisLabel: {color: muted, fontSize: 12,
                   interval: (i, val) => val.endsWith("Q1"),
                   formatter: val => val.slice(0, 4)},
     },
     yAxis: {
-      type: "value", axisLabel: {color: muted, fontSize: 11},
+      type: "value", axisLabel: {color: muted, fontSize: 12},
       splitLine: {lineStyle: {color: grid}},
     },
     tooltip: {
@@ -251,7 +265,7 @@ document.getElementById("callouts").innerHTML = [
     animationDuration: 350,
   };
   const mk = (id, opt) => {
-    const c = echarts.init(document.getElementById(id), null, {renderer: "canvas"});
+    const c = echarts.init(document.getElementById(id), "cascadia", {renderer: "canvas"});
     c.setOption(opt);
     return c;
   };
@@ -266,7 +280,7 @@ document.getElementById("callouts").innerHTML = [
              ` · ${signed(M.revenue.yoy_pct[i], "%")} YoY${flagNote(M.revenue, i)}`;
     }},
     series: [{type: "bar", data: M.revenue.values, barMaxWidth: 14,
-              itemStyle: {color: s1, borderRadius: [3, 3, 0, 0]}}],
+              itemStyle: {color: s1, borderRadius: 0}}],
   }));
 
   /* Gross margin — 2px line, y-axis zoomed to the data (not a bar, so no zero-base rule). */
@@ -296,7 +310,7 @@ document.getElementById("callouts").innerHTML = [
        64px of clearance are gone — see the series note below. */
     grid: {...base.grid, top: 34},
     legend: {top: 0, right: 0, icon: "roundRect", itemWidth: 12, itemHeight: 8,
-             textStyle: {color: ink2, fontSize: 11}},
+             textStyle: {color: ink2, fontSize: 12}},
     yAxis: {...base.yAxis, axisLabel: {...base.yAxis.axisLabel, formatter: v => v + "%"}},
     tooltip: {...base.tooltip, formatter: ps => {
       const i = ps[0].dataIndex;
@@ -342,10 +356,10 @@ document.getElementById("callouts").innerHTML = [
       return `<b>${fq(P[i])}</b><br>Diluted EPS ${fmtEps(M.eps_diluted.values[i])}` +
              ` · ${signed(M.eps_diluted.yoy_delta[i], "", 2)} YoY${flagNote(M.eps_diluted, i)}` +
              (note ? `<div style="max-width:230px;white-space:normal;color:${muted};` +
-                     `font-size:11px;margin-top:4px;">${note.n} ${note.text}</div>` : "");
+                     `font-size:12px;margin-top:4px;">${note.n} ${note.text}</div>` : "");
     }},
     series: [{type: "bar", data: M.eps_diluted.values, barMaxWidth: 14,
-              itemStyle: {color: s1, borderRadius: [3, 3, 0, 0]},
+              itemStyle: {color: s1, borderRadius: 0},
               /* Circled-number tags tie the two anomaly bars to the footnotes.
                  Anchored at each bar's tip and nudged clear of it — up for the
                  positive spike, down for the negative bar — so nothing overlaps
@@ -353,7 +367,7 @@ document.getElementById("callouts").innerHTML = [
               markPoint: {
                 symbol: "circle", symbolSize: 16, silent: true,
                 itemStyle: {color: surface, borderColor: s1, borderWidth: 1},
-                label: {color: ink2, fontSize: 11, fontWeight: 700,
+                label: {color: ink2, fontSize: 12, fontWeight: 700,
                         formatter: p => p.data.name},
                 data: Object.keys(epsNotes).map(per => {
                   const i = P.indexOf(per);
@@ -363,6 +377,68 @@ document.getElementById("callouts").innerHTML = [
                 }),
               }}],
   }));
+
+  /* ---- Rules 4.2 and 5.1 — provenance strip and the three access layers ---
+     Built from the same arrays the charts plot, so what a screen reader is
+     told cannot drift from what is drawn. All four point at the table view,
+     which already carries every series in full. */
+  if (typeof CASCADIA !== "undefined") {
+    const SRC = "SEC EDGAR — FormFactor companyfacts XBRL";
+    const say = (v, unit) =>
+      v == null ? "no value"
+      : unit === "pct" ? v.toFixed(1) + " percent"
+      : unit === "eps" ? "$" + v.toFixed(2)
+      : "$" + v.toFixed(1) + " million";
+
+    /* Extrema and endpoints, not 33 values read aloud. L2 is the shape of the
+       series; a screen reader announcing every quarter is unusable, and the
+       full series is one keystroke away in the table these charts point at. */
+    const shape = (vals, unit) => {
+      const pts = vals.map((v, i) => [v, i]).filter(([v]) => v != null);
+      if (!pts.length) return " No values.";
+      const lo = pts.reduce((a, b) => (b[0] < a[0] ? b : a));
+      const hi = pts.reduce((a, b) => (b[0] > a[0] ? b : a));
+      const f = pts[0], l = pts[pts.length - 1];
+      return ` Ranges from ${say(lo[0], unit)} in ${P[lo[1]]} to ${say(hi[0], unit)} in ${P[hi[1]]}.` +
+             ` Starts ${P[f[1]]} ${say(f[0], unit)}, ends ${P[l[1]]} ${say(l[0], unit)}.`;
+    };
+
+    const wire = (id, chart, form, what, unit, series) => {
+      CASCADIA.accessible(id, {
+        tableId: "data-table",
+        label: `${form}. ${what}, by fiscal quarter, ${P[0]} to ${P[P.length - 1]}, ` +
+          `${P.length} quarters.` +
+          (series.length === 1
+            ? shape(series[0].data, unit)
+            : series.map(s => ` ${s.name}:` + shape(s.data, unit)).join(""))
+      });
+      CASCADIA.navigator(id, {
+        chart,
+        label: `${what}. ${series.length} series of ${P.length} quarters.`,
+        series: series.map((s, si) => ({
+          name: s.name,
+          points: s.data.map((v, di) => ({
+            label: P[di], value: say(v, unit), seriesIndex: si, dataIndex: di
+          }))
+        }))
+      });
+      CASCADIA.provenance(id, {
+        source: SRC, asOf: DATA.as_of_date,
+        flags: "GAAP as filed; ‡ Q4 derived as FY − (Q1+Q2+Q3)"
+      });
+    };
+
+    wire("chart-revenue", charts[0], "Bar chart", "Revenue in millions of dollars",
+         "usd", [{name: "Revenue", data: M.revenue.values}]);
+    wire("chart-gm", charts[1], "Line chart",
+         "GAAP gross margin as a percentage of revenue",
+         "pct", [{name: "Gross margin", data: M.gross_margin_pct.values}]);
+    wire("chart-opex", charts[2], "Line chart",
+         "Operating expense ratios as a percentage of revenue",
+         "pct", opexSeries.map(s => ({name: s.name, data: s.data})));
+    wire("chart-eps", charts[3], "Bar chart", "Diluted earnings per share in dollars",
+         "eps", [{name: "Diluted EPS", data: M.eps_diluted.values}]);
+  }
 
   /* ResizeObserver (not a window listener) so charts track their container
      through any reflow — grid collapse at phone width, print, etc. */
@@ -393,7 +469,7 @@ document.getElementById("callouts").innerHTML = [
             cols.map(c => `<td style="${cell}">${c[1](i)}</td>`).join("") + "</tr>";
   }
   document.getElementById("data-table").innerHTML =
-    html + "</tbody><caption style='caption-side:bottom;text-align:left;color:var(--muted);font-size:11.5px;padding-top:6px;'>‡ Q4 derived = FY − (Q1+Q2+Q3). GAAP per XBRL filings, as-of " + DATA.as_of_date + ".</caption>";
+    html + "</tbody><caption style='caption-side:bottom;text-align:left;color:var(--muted);font-size:12px;padding-top:6px;'>‡ Q4 derived = FY − (Q1+Q2+Q3). GAAP per XBRL filings, as-of " + DATA.as_of_date + ".</caption>";
 })();
 </script>
 
