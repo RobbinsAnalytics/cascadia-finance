@@ -50,6 +50,12 @@ protected_paths = [
   # The announced tier of the Q2 comparison. Its figures are the other half of
   # the reconciliation and must stay exactly as published.
   "docs/q2-readthrough.html",
+
+  # The shared stylesheet. Not a page, but every frozen page above renders
+  # through it — a single edit here restyles all four at once, which is a change
+  # to frozen pages arriving by a route the gate could not see. Protected so
+  # that edit is a gate event rather than an invisible one.
+  "docs/assets/cascadia.css",
 ]
 
 # ---------------------------------------------------------------------------
