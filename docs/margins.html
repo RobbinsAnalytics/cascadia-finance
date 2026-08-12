@@ -12,8 +12,11 @@
 <meta property="og:url" content="https://www.robbinsanalytics.com/cascadia-finance/margins.html">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://www.robbinsanalytics.com/cascadia-finance/assets/og-finance.png">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/cascadia.css">
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
+<!-- Local, and after ECharts so registerTheme('cascadia') finds it. -->
+<script src="assets/cascadia-echarts-theme.js"></script>
 </head>
 <body>
 
@@ -62,6 +65,17 @@
         <div class="chart" id="chart-bridge"></div>
       </div>
     </div>
+    <!-- Rule 5.1 layer 2. The segment table further down carries the segment
+         series, but nothing on this page tabulated consolidated gross margin
+         or its decomposition, so those two charts had no non-visual route to
+         their data. Pointing them at the segment table would have been worse
+         than pointing them nowhere. -->
+    <details>
+      <summary style="cursor:pointer;color:var(--ink-2);font-size:14px;">Show gross-margin table</summary>
+      <div style="overflow-x:auto;margin-top:10px;">
+        <table id="gm-table" style="border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums;white-space:nowrap;"></table>
+      </div>
+    </details>
   </section>
 
   <!-- ============================ SEGMENTS ============================ -->
@@ -283,17 +297,27 @@ document.getElementById("seg-kpi-grid").innerHTML = [
   }
   const ink2 = css("--ink-2"), muted = css("--muted"), grid = css("--grid"),
         baseline = css("--baseline"), s1 = css("--s1"), s2 = css("--s2"), s3 = css("--s3"),
-        upInk = css("--up-ink"), downInk = css("--down-ink"), surface = css("--surface") || "#fff";
+        surface = css("--surface") || "#fff",
+        rain = css("--rain"), ink = css("--ink");
+  /* --up-ink / --down-ink are deliberately NOT read here any more. They were
+     colouring the Corporate/unallocated bar by sign, and the stylesheet says
+     in as many words that the variance signals are never reused as series
+     colours. The sign is still carried, in the label, which prints the minus. */
+  /* Rule 2.3.7 — the mark takes the palette value, text takes the ink. */
+  const i1 = css("--ink-s1"), i2 = css("--ink-s2"), i3 = css("--ink-s3");
   const charts = [];
-  const mk = (id, opt) => { const c = echarts.init(document.getElementById(id), null, {renderer: "canvas"}); c.setOption(opt); charts.push(c); return c; };
+  const mk = (id, opt) => { const c = echarts.init(document.getElementById(id), "cascadia", {renderer: "canvas"}); c.setOption(opt); charts.push(c); return c; };
 
   /* shared axis/tooltip base (same look as the Phase A page) */
   const base = {
+    /* ECharts' own aria off — it overwrites the authored label on every
+       render. See the note in q2-readthrough.html. */
+    aria: {enabled: false},
     grid: {left: 8, right: 14, top: 16, bottom: 4, containLabel: true},
     xAxis: {type: "category", data: P, axisTick: {show: false},
       axisLine: {lineStyle: {color: baseline}},
-      axisLabel: {color: muted, fontSize: 11, interval: (i, v) => v.endsWith("Q1"), formatter: v => v.slice(0, 4)}},
-    yAxis: {type: "value", axisLabel: {color: muted, fontSize: 11}, splitLine: {lineStyle: {color: grid}}},
+      axisLabel: {color: muted, fontSize: 12, interval: (i, v) => v.endsWith("Q1"), formatter: v => v.slice(0, 4)}},
+    yAxis: {type: "value", axisLabel: {color: muted, fontSize: 12}, splitLine: {lineStyle: {color: grid}}},
     tooltip: {trigger: "axis", confine: true, backgroundColor: "#fff", borderColor: grid,
       textStyle: {color: ink2, fontSize: 12}},
     animationDuration: 350,
@@ -307,7 +331,7 @@ document.getElementById("seg-kpi-grid").innerHTML = [
     tooltip: {...base.tooltip, formatter: ps => {
       const i = ps[0].dataIndex;
       const b = bridge(i);
-      const note = b ? `<div style="color:${muted};font-size:11px;margin-top:3px;">rev effect ${signed(b.revenueEffect,"M",1)} · margin effect ${signed(b.marginEffect,"M",1)}</div>` : "";
+      const note = b ? `<div style="color:${muted};font-size:12px;margin-top:3px;">rev effect ${signed(b.revenueEffect,"M",1)} · margin effect ${signed(b.marginEffect,"M",1)}</div>` : "";
       return `<b>${fq(P[i])}</b><br>GAAP gross margin ${fmtPct(CM.gross_margin_pct.values[i])}` +
              ` · gross profit ${fmtM(CM.gross_profit.values[i])}${note}`;
     }},
@@ -315,7 +339,7 @@ document.getElementById("seg-kpi-grid").innerHTML = [
       lineStyle: {width: 2, color: s1}, itemStyle: {color: s1},
       markPoint: {symbol: "pin", symbolSize: 42, silent: true,
         itemStyle: {color: surface, borderColor: s1, borderWidth: 1},
-        label: {color: ink2, fontSize: 10, fontWeight: 600, formatter: "Q1\nFY26"},
+        label: {color: ink2, fontSize: 12, fontWeight: 600, formatter: "Q1\nFY26"},
         data: [{coord: [gmInflect, CM.gross_margin_pct.values[gmInflect]], symbolOffset: [0, -4]}]}}],
   });
 
@@ -326,7 +350,7 @@ document.getElementById("seg-kpi-grid").innerHTML = [
   const netGP  = P.map((_, i) => { const b = bridge(i); return b ? +b.net.toFixed(2) : null; });
   mk("chart-bridge", {...base,
     grid: {...base.grid, top: 30},
-    legend: {top: 0, right: 0, itemWidth: 12, itemHeight: 8, textStyle: {color: ink2, fontSize: 11},
+    legend: {top: 0, right: 0, itemWidth: 12, itemHeight: 8, textStyle: {color: ink2, fontSize: 12},
       data: ["Revenue effect", "Margin effect", "Δ Gross profit"]},
     yAxis: {...base.yAxis, axisLabel: {...base.yAxis.axisLabel, formatter: v => "$" + v + "M"}},
     tooltip: {...base.tooltip, formatter: ps => {
@@ -335,8 +359,8 @@ document.getElementById("seg-kpi-grid").innerHTML = [
         `Margin effect ${signed(marEff[i], "M", 1)}<br><b>Δ Gross profit ${signed(netGP[i], "M", 1)}</b>`;
     }},
     series: [
-      {name: "Revenue effect", type: "bar", stack: "b", data: revEff, itemStyle: {color: s2}, barMaxWidth: 16},
-      {name: "Margin effect", type: "bar", stack: "b", data: marEff, itemStyle: {color: s3}, barMaxWidth: 16},
+      {name: "Revenue effect", type: "bar", stack: "b", data: revEff, itemStyle: {color: s1}, barMaxWidth: 16},
+      {name: "Margin effect", type: "bar", stack: "b", data: marEff, itemStyle: {color: s2}, barMaxWidth: 16},
       {name: "Δ Gross profit", type: "line", data: netGP, showSymbol: false, lineStyle: {width: 1.5, color: ink2}, z: 3},
     ],
   });
@@ -347,7 +371,7 @@ document.getElementById("seg-kpi-grid").innerHTML = [
   mk("chart-segmix", {...base,
     grid: {...base.grid, top: 30},
     legend: {top: 0, right: 0, icon: "roundRect", itemWidth: 12, itemHeight: 8,
-      textStyle: {color: ink2, fontSize: 11}, data: ["Probe Cards", "Systems"]},
+      textStyle: {color: ink2, fontSize: 12}, data: ["Probe Cards", "Systems"]},
     yAxis: {...base.yAxis, axisLabel: {...base.yAxis.axisLabel, formatter: v => "$" + v + "M"}},
     tooltip: {...base.tooltip, formatter: ps => {
       const i = ps[0].dataIndex, tot = probeRev[i] + sysRev[i];
@@ -366,7 +390,7 @@ document.getElementById("seg-kpi-grid").innerHTML = [
   mk("chart-seggm", {...base,
     grid: {...base.grid, top: 30},
     legend: {top: 0, right: 0, icon: "roundRect", itemWidth: 12, itemHeight: 8,
-      textStyle: {color: ink2, fontSize: 11}, data: ["Probe Cards", "Systems"]},
+      textStyle: {color: ink2, fontSize: 12}, data: ["Probe Cards", "Systems"]},
     yAxis: {...base.yAxis, axisLabel: {...base.yAxis.axisLabel, formatter: v => v + "%"}},
     tooltip: {...base.tooltip, formatter: ps => {
       const i = ps[0].dataIndex;
@@ -394,12 +418,16 @@ document.getElementById("seg-kpi-grid").innerHTML = [
   const c2 = pGP + sGP;                                   // cumulative before corporate
   const baseArr = [0, pGP, Math.min(c2, c2 + cGP), 0];
   const dispArr = [pGP, sGP, Math.abs(cGP), consGP];
-  const colors  = [s1, s2, cGP < 0 ? downInk : upInk, baseline];
+  const colors  = [s1, s2, s3, rain];
   mk("chart-gpbridge", {
+    /* This chart builds its options from scratch rather than spreading `base`,
+       so it needs its own copy of the aria opt-out. Same reason as the rest:
+       ECharts overwrites the authored label on every render. */
+    aria: {enabled: false},
     grid: {left: 8, right: 16, top: 20, bottom: 4, containLabel: true},
     xAxis: {type: "category", data: cats, axisTick: {show: false}, axisLine: {lineStyle: {color: baseline}},
-      axisLabel: {color: ink2, fontSize: 11, lineHeight: 13}},
-    yAxis: {type: "value", axisLabel: {color: muted, fontSize: 11, formatter: v => "$" + v + "M"},
+      axisLabel: {color: ink2, fontSize: 12, lineHeight: 15}},
+    yAxis: {type: "value", axisLabel: {color: muted, fontSize: 12, formatter: v => "$" + v + "M"},
       splitLine: {lineStyle: {color: grid}}},
     tooltip: {trigger: "item", confine: true, backgroundColor: "#fff", borderColor: grid,
       textStyle: {color: ink2, fontSize: 12}, formatter: p => {
@@ -410,11 +438,94 @@ document.getElementById("seg-kpi-grid").innerHTML = [
     series: [
       {type: "bar", stack: "w", data: baseArr, itemStyle: {color: "transparent"}, silent: true, barMaxWidth: 68},
       {type: "bar", stack: "w", barMaxWidth: 68,
-        data: dispArr.map((v, i) => ({value: v, itemStyle: {color: colors[i], borderRadius: 2}})),
-        label: {show: true, position: "top", color: ink2, fontSize: 11, fontWeight: 600,
+        data: dispArr.map((v, i) => ({value: v, itemStyle: {color: colors[i]}})),
+        label: {show: true, position: "top", color: ink, fontSize: 12, fontWeight: 600,
           formatter: p => (p.dataIndex === 2 && cGP < 0 ? "−" : "") + fmtM([pGP, sGP, Math.abs(cGP), consGP][p.dataIndex])}},
     ],
   });
+
+  /* ---- Rule 5.1 layer 2 for the two consolidated charts ------------------
+     Same values the two charts plot, nothing derived. */
+  (function gmTable() {
+    const cell = "padding:4px 10px;border-bottom:1px solid var(--grid);text-align:right;";
+    const head = "padding:6px 10px;border-bottom:2px solid var(--baseline);text-align:right;color:var(--ink-2);";
+    let html = "<thead><tr><th style='" + head + "text-align:left;'>Quarter</th>" +
+      ["GAAP gross margin", "Revenue effect", "Margin effect", "Δ Gross profit"]
+        .map(c => `<th style="${head}">${c}</th>`).join("") + "</tr></thead><tbody>";
+    P.forEach((per, i) => {
+      const g = CM.gross_margin_pct.values[i];
+      html += `<tr><td style="${cell}text-align:left;">${fq(per)}</td>` +
+        `<td style="${cell}">${g == null ? "—" : fmtPct(g)}</td>` +
+        `<td style="${cell}">${revEff[i] == null ? "—" : fmtM(revEff[i])}</td>` +
+        `<td style="${cell}">${marEff[i] == null ? "—" : fmtM(marEff[i])}</td>` +
+        `<td style="${cell}">${netGP[i] == null ? "—" : fmtM(netGP[i])}</td></tr>`;
+    });
+    document.getElementById("gm-table").innerHTML = html + "</tbody>";
+  })();
+
+  /* ---- Rules 4.2 and 5.1 — provenance and the access layers -------------- */
+  if (typeof CASCADIA !== "undefined") {
+    const SRC = "SEC EDGAR — FormFactor companyfacts and segment XBRL";
+    const say = (v, u) => v == null ? "no value"
+      : u === "pct" ? v.toFixed(1) + " percent" : "$" + v.toFixed(1) + " million";
+    /* Extrema and endpoints — 33 quarters read aloud is unusable, and both
+       tables on this page carry the full series. */
+    const shape = (vals, u) => {
+      const pts = vals.map((v, i) => [v, i]).filter(([v]) => v != null);
+      if (!pts.length) return " No values.";
+      const lo = pts.reduce((a, b) => (b[0] < a[0] ? b : a));
+      const hi = pts.reduce((a, b) => (b[0] > a[0] ? b : a));
+      const f = pts[0], l = pts[pts.length - 1];
+      return ` Ranges from ${say(lo[0], u)} in ${P[lo[1]]} to ${say(hi[0], u)} in ${P[hi[1]]}.` +
+             ` Starts ${P[f[1]]} ${say(f[0], u)}, ends ${P[l[1]]} ${say(l[0], u)}.`;
+    };
+    const wire = (id, chart, tableId, form, what, unit, series, cats) => {
+      const overCats = cats || P;
+      CASCADIA.accessible(id, {
+        tableId: tableId,
+        label: `${form}. ${what}, ${cats ? cats.length + " categories" :
+          "by fiscal quarter, " + P[0] + " to " + P[P.length - 1] + ", " + P.length + " quarters"}.` +
+          (cats
+            ? " " + series[0].data.map((v, i) =>
+                `${overCats[i].replace("\n", " ")} ${say(v, unit)}`).join("; ") + "."
+            : (series.length === 1 ? shape(series[0].data, unit)
+               : series.map(s => ` ${s.name}:` + shape(s.data, unit)).join("")))
+      });
+      CASCADIA.navigator(id, {
+        chart,
+        label: `${what}. ${series.length} series.`,
+        series: series.map((s, si) => ({
+          name: s.name,
+          points: s.data.map((v, di) => ({
+            label: overCats[di].replace("\n", " "), value: say(v, unit),
+            seriesIndex: s.seriesIndex == null ? si : s.seriesIndex, dataIndex: di
+          }))
+        }))
+      });
+      CASCADIA.provenance(id, {
+        source: SRC, asOf: C.as_of_date,
+        flags: "GAAP as filed; ‡ Q4 derived as FY − (Q1+Q2+Q3)"
+      });
+    };
+
+    wire("chart-gm", charts[0], "gm-table", "Line chart",
+         "GAAP gross margin as a percentage of revenue", "pct",
+         [{name: "GAAP gross margin", data: CM.gross_margin_pct.values}]);
+    wire("chart-bridge", charts[1], "gm-table", "Stacked bar chart with a line overlay",
+         "Quarterly change in gross profit, in millions of dollars, split into a revenue effect and a margin effect",
+         "usd", [{name: "Revenue effect", data: revEff},
+                 {name: "Margin effect", data: marEff},
+                 {name: "Change in gross profit", data: netGP}]);
+    wire("chart-segmix", charts[2], "seg-table", "Stacked bar chart",
+         "Segment revenue in millions of dollars", "usd",
+         [{name: "Probe Cards", data: probeRev}, {name: "Systems", data: sysRev}]);
+    wire("chart-seggm", charts[3], "seg-table", "Line chart",
+         "Segment gross margin as a percentage of segment revenue", "pct",
+         [{name: "Probe Cards", data: probeGM}, {name: "Systems", data: sysGM}]);
+    wire("chart-gpbridge", charts[4], "seg-table", "Waterfall chart",
+         "Segment gross profit reconciled to consolidated GAAP gross profit, in millions of dollars",
+         "usd", [{name: "Gross-profit bridge", data: [pGP, sGP, cGP, consGP], seriesIndex: 1}], cats);
+  }
 
   /* Track container reflow (grid collapse at phone width, print, etc.). */
   const ro = new ResizeObserver(() => charts.forEach(c => c.resize()));
