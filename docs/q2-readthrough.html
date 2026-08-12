@@ -362,6 +362,14 @@ var CASCADIA_DATA = {
 
   var c1 = echarts.init(document.getElementById("c1"), "cascadia", { renderer: "svg" });
   c1.setOption({
+    /* ECharts' own aria is OFF, deliberately. The theme enables it, but ECharts
+       writes its generated label onto the SAME element cascadiaAccessible()
+       authors, on every render — so the authored L1+L2 label was silently
+       replaced, and what a screen reader actually got was a description of the
+       transparent stacking series: "The 0 series is a Bar chart representing
+       base ... 0, 0, 0, NaN". Worse than no label. The theme's own header says
+       the real access layer is DOM-side; this lets it be. */
+    aria: {enabled: false},
     backgroundColor: SURF,
     grid: { left: 46, right: 16, top: 26, bottom: 44 },
     tooltip: {
@@ -438,6 +446,7 @@ var CASCADIA_DATA = {
   };
   var c2 = echarts.init(document.getElementById("c2"), "cascadia", { renderer: "svg" });
   c2.setOption({
+    aria: {enabled: false},   // see the note on c1
     backgroundColor: SURF,
     grid: { left: 44, right: 132, top: 26, bottom: 40 },
     /* Rule 3.6 — legend removed. Every series already ends in a direct label
