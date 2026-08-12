@@ -113,6 +113,42 @@ protected_paths = [
 #   q2-readthrough.html names the 8-K earnings release as its source, matching
 #   the announced-tier provenance the page already declares, so the metadata
 #   cannot imply the page is XBRL-derived when it is not.
+#
+# 2026-08-12 — VIZ-PRINCIPLES v2.5 reskin. Aaron authorized adopting the full
+#   Cascadia chart signature across all five report pages: palette, Source
+#   Serif 4 type pairing, per-chart provenance strips, the shared ECharts
+#   theme, three access layers, and finding-titles per Rule 3.1.
+#
+#   This is larger than anything authorized above and should not be read in
+#   their language. The four entries before it are a cross-link, a nav kicker,
+#   a URL rename and head metadata — three of them explicitly changed nothing
+#   visible. This one changes the appearance of every element on all four
+#   frozen pages, and it adds nineteen chart titles that state findings rather
+#   than name metrics. A finding-title is a claim a reader repeats without
+#   checking, so those nineteen strings are the substance of this
+#   authorization rather than a detail of it: each is traced to a figure
+#   already rendered on its own page, and Aaron reads and approves all
+#   nineteen before any is committed. A title needing a number the page does
+#   not already show is out of scope.
+#
+#   The data freeze is untouched. as_of_date stays 2026-07-21, nothing was
+#   re-pulled, and no figure, label on a figure, or flag changed. The gate
+#   cannot prove that here — baseline = "HEAD" makes validate_freeze.py a
+#   change-detector against the last commit, and it will report PASS across
+#   this whole reskin — so the proof is governance/reskin-baseline/, captured
+#   before any edit and re-checked at Phase 6 with
+#   src/capture_charts.py --diff. Any delta there is a defect, not a finding.
+#
+#   docs/assets/cascadia.css joined protected_paths in its own commit first,
+#   so the shared-stylesheet edit that restyles all four frozen pages at once
+#   is a gate event rather than an invisible one. Expect freeze failures
+#   naming only that file and the page under edit. A failure naming any other
+#   path — anything under data/raw/ or data/conformed/, or a page outside the
+#   current phase — is the real thing: stop, revert, report.
+#
+#   Open item 20 is not yet adopted, so this proceeds under a retroactive
+#   declaration: when item 20 lands, its retrospective v2.1–v2.5 declaration
+#   must name this reskin and state its branch.
 # ---------------------------------------------------------------------------
 
 # No active exemptions. Under baseline = "HEAD" every protected path above is
