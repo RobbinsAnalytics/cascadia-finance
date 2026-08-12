@@ -37,6 +37,7 @@ import argparse
 import functools
 import http.server
 import json
+import re
 import socket
 import socketserver
 import sys
@@ -244,6 +245,23 @@ def capture(root: Path, out: Path) -> dict:
     return fixture
 
 
+# A fixture line reads `path = json-value`. A delta counts as a colour change
+# only if the path ends in a key that carries a colour AND the value is a hex
+# or rgb string. Both halves are required: `label.color = "#5b6660"` is a
+# restyle, but a `color` key holding anything else is not something to wave
+# through, and no other key is.
+_COLOUR_KEY = re.compile(r"\.(color|borderColor|backgroundColor|textBorderColor"
+                         r"|shadowColor|areaColor)$")
+_COLOUR_VALUE = re.compile(r'^"(#[0-9a-fA-F]{3,8}|rgba?\([^"]*\))"$')
+
+
+def is_colour_change(line: str) -> bool:
+    path, sep, value = line.partition(" = ")
+    if not sep:
+        return False
+    return bool(_COLOUR_KEY.search(path) and _COLOUR_VALUE.match(value.strip()))
+
+
 def flatten(fixture: dict) -> list[str]:
     """The fixture as sorted `path = value` lines.
 
@@ -297,17 +315,38 @@ def main() -> int:
         prior = base / args.diff / "numeric-fixture.txt"
         if not prior.exists():
             sys.exit(f"no fixture to diff against at {prior}")
-        before = prior.read_text(encoding="utf-8").splitlines()
-        after = lines
-        delta = set(before) ^ set(after)
-        if delta:
-            print(f"NUMERIC DIFF vs {args.diff}: {len(delta)} lines differ")
-            for line in sorted(delta)[:60]:
-                side = "-" if line in set(before) else "+"
-                print(f"  {side} {line}")
-            print("\nAny delta is a defect, not a finding.")
+        before = set(prior.read_text(encoding="utf-8").splitlines())
+        after = set(lines)
+        delta = sorted(before ^ after)
+
+        # A reskin changes colours by definition, and peers.html carries
+        # itemStyle.color INSIDE series.data — so a palette swap shows up as a
+        # data delta. Reporting that as a numeric defect makes the gate cry
+        # wolf on every phase, and a gate nobody believes is worse than none.
+        #
+        # This classifies; it does not suppress. Both counts are always
+        # printed, and the test is deliberately narrow — a known colour key
+        # AND a hex or rgb() value. Anything else, including a colour key
+        # holding something that is not a colour, counts as a numeric defect.
+        # Widen this only with a reason.
+        #
+        # Note this is the REPORTING half of the tool. EXTRACT_JS and flatten()
+        # are untouched, so a fixture captured before this change still
+        # compares against one captured after it.
+        colour_delta = [d for d in delta if is_colour_change(d)]
+        numeric_delta = [d for d in delta if not is_colour_change(d)]
+
+        print(f"DIFF vs {args.diff}: {len(after)} facts, "
+              f"{len(colour_delta)} colour deltas, "
+              f"{len(numeric_delta)} numeric deltas")
+
+        if numeric_delta:
+            print(f"\nNUMERIC DELTA — {len(numeric_delta)} lines:")
+            for line in numeric_delta[:60]:
+                print(f"  {'-' if line in before else '+'} {line}")
+            print("\nAny delta here is a defect, not a finding.")
             return 1
-        print(f"NUMERIC DIFF vs {args.diff}: clean — {len(after)} facts identical.")
+        print("\nNo number moved.")
     return 0
 
 

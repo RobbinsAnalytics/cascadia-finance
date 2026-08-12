@@ -3,22 +3,119 @@
    whitespace. Design tokens up top; every page in this module uses them.
    ========================================================================== */
 
+/* ---- the voice face, self-hosted ----------------------------------------
+   Source Serif 4, instanced from the OFL variable font at wght 400 and 600
+   and subset to the Latin these pages set. See src/build_font_subset.py for
+   the source, version and exact build; SourceSerif4-OFL.txt travels with the
+   binaries because the licence requires it.
+
+   Self-hosted rather than linked, and the reason is a claim rather than a
+   preference: this module says the site works offline and forever, and a
+   Google-hosted webfont would make the voice depend on a third party still
+   being there. local() first so a reader who already has the face installed
+   downloads nothing. font-display: swap so the text is readable immediately
+   in Georgia and reflows to the real face — never invisible while waiting. */
+@font-face {
+  font-family: "Source Serif 4";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local("Source Serif 4"), local("SourceSerif4-Regular"),
+       url("SourceSerif4-Regular-subset.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Source Serif 4";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local("Source Serif 4 SemiBold"), local("SourceSerif4-SemiBold"),
+       url("SourceSerif4-Semibold-subset.woff2") format("woff2");
+}
+
 :root {
   color-scheme: light;
-  /* surfaces & ink */
-  --page:        #f9f9f7;
-  --surface:     #fcfcfb;
-  --ink:         #0b0b0b;
-  --ink-2:       #52514e;
-  --muted:       #898781;
-  --grid:        #e1e0d9;
-  --baseline:    #c3c2b7;
-  --ring:        rgba(11, 11, 11, 0.10);
-  /* series (validated categorical order — do not re-order) */
-  --s1:          #2a78d6;   /* blue    */
-  --s2:          #008300;   /* green   */
-  --s3:          #e87ba4;   /* magenta — low contrast: always direct-labeled */
-  /* variance signals (never reused as series colors) */
+
+  /* ---- surfaces & ink — the Cascadia neutrals ----------------------------
+     These are the values cascadia-echarts-theme.js paints INSIDE the chart.
+     Page chrome takes the same ones so the card and the canvas read as one
+     surface instead of two near-misses. */
+  --page:        #f6f7f4;   /* paper blended 25% toward mist, for the ground */
+  --surface:     #fcfcfa;   /* paper      */
+  --ink:         #232b27;   /* basalt     — 14.1:1 on paper */
+  --ink-2:       #5b6660;   /* slate moss —  5.8:1 on paper */
+  /* --muted was #898781, which measured 3.41:1 on the page ground and 3.50:1
+     on a card: below 4.5:1, so every kicker, chart subtitle, footnote and
+     disclosure on all five pages failed WCAG AA as text. Rule 5.3 is
+     INVARIANT, so it collapses onto slate moss (5.6:1). --ink-2 and --muted
+     are now the same value and the secondary/tertiary distinction is carried
+     by size and weight rather than by a third grey. Deliberate: the system
+     has one secondary ink, and the theme uses slate moss for every secondary
+     string inside a chart. */
+  --muted:       #5b6660;   /* slate moss */
+  --grid:        #e4e7e3;   /* mist       */
+  --baseline:    #e4e7e3;   /* mist — the theme draws axis lines in it too   */
+  --ring:        rgba(35, 43, 39, 0.10);
+
+  /* ---- series — Rule 2.3.1 fixed slots ----------------------------------
+     Slot order, never cycled, never re-dealt on filter. Rule 2.3.5 caps a
+     single chart at four of these.
+
+     --s3 keeps the direct-label condition it has always carried, but the
+     reason has changed and the change matters. The old --s3 (#e87ba4) was
+     sub-threshold, and the label was the compensating condition that made an
+     illegal hue legal. Madrona measures 4.31:1 and clears the 3:1 a mark
+     owes, so it needs no compensation — the label stays because Rule 3.6
+     wants one on every series regardless.
+
+     The written 2.3.6 exception now attaches to Rain below, which is where a
+     sub-threshold hue actually lives. */
+  --s1:          #1e7a4c;   /* evergreen — 5.18:1 */
+  --s2:          #4c8bc0;   /* glacier   — 3.55:1 */
+  --s3:          #c05a2e;   /* madrona   — 4.31:1, always direct-labeled */
+
+  /* De-emphasis and context, NOT a fourth slot — a Rain series is not an
+     encoded category. It measures 2.45:1, under the 3:1 a mark owes, and
+     Rule 2.3.6 permits it ONLY where every series it colours carries a direct
+     text label at 4.5:1. The label is the compensating condition, not
+     styling: drop it to fit a width and the chart fails 2.3.6 and 5.3 at
+     once, silently. (It replaces a hardcoded #aab2ba in peers.html, which was
+     worse at 2.09:1.) */
+  --rain:        #9aa6a0;
+
+  /* ---- Rule 2.3.7 text inks ---------------------------------------------
+     A palette hue used as TEXT owes 4.5:1, not the 3:1 that governs the mark.
+     Glacier and Madrona do not clear it, so each is darkened along its own
+     hue by the least amount that does — the mark keeps its full value, so a
+     series keeps its identity between mark and label. Evergreen already
+     cleared and is unchanged in both.
+
+     Taken from CASCADIA.textInk, never re-derived here. Use for direct
+     labels, end-of-series labels, data labels, annotation prose and links —
+     never for the mark. */
+  --ink-s1:      #1e7a4c;   /* evergreen, unchanged — 5.18:1 */
+  --ink-s2:      #4279a7;   /* glacier darkened      — 4.52:1 */
+  --ink-s3:      #ba572d;   /* madrona darkened      — 4.55:1 */
+  --ink-serif:   #232b27;   /* basalt — the serif voice */
+
+  /* ---- type pairing ------------------------------------------------------
+     Serif voice for headings, findings and annotations; sans for data, tables
+     and labels. Georgia is the sanctioned substitute where the web face is
+     unavailable, so the stack degrades to a designed fallback rather than an
+     arbitrary one. */
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --sans:  "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
+
+  /* ---- variance signals (never reused as series colors) ------------------
+     Structurally separate from the palette, as they have always been, and
+     unchanged by the swap. The chips carry an arrow and signed text, so
+     colour is never the only channel and Rule 2.3.2 holds.
+
+     NOTE for review: --up-ink and the new --s1 are both green and measure
+     1.42:1 against each other — a reader cannot tell them apart by hue. They
+     never touch (chips sit in KPI cards, series in charts) and the arrow
+     carries the meaning, so this is a coherence question rather than a
+     conformance failure. It is a live question for the Rule 7.4 panel, not a
+     thing to fix quietly here. */
   --up-ink:      #006300;
   --up-bg:       #e9f3e9;
   --down-ink:    #b02f2f;
@@ -33,7 +130,7 @@ body {
   margin: 0;
   background: var(--page);
   color: var(--ink);
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: var(--sans);
   font-size: 15px;
   line-height: 1.5;
   -webkit-text-size-adjust: 100%;
@@ -49,9 +146,16 @@ body {
 }
 .kicker a { color: var(--muted); text-decoration: none; }
 .kicker a:hover { text-decoration: underline; }
-h1 { font-size: clamp(22px, 4.5vw, 30px); margin: 0 0 6px; font-weight: 650; }
+/* The serif voice. Headings, findings and annotations only — numbers, axes,
+   tables and metadata stay sans, and the contrast between the two is the
+   point of the pairing. */
+h1 {
+  font-family: var(--serif); color: var(--ink-serif);
+  font-size: clamp(22px, 4.5vw, 30px); margin: 0 0 6px; font-weight: 600;
+}
 .subtitle { color: var(--ink-2); margin: 0 0 10px; max-width: 62ch; }
-.subtitle a, .chart-sub a { color: var(--s1); text-decoration: none; }
+/* Link text takes the text ink, not the mark value — Rule 2.3.7. */
+.subtitle a, .chart-sub a { color: var(--ink-s1); text-decoration: none; }
 .subtitle a:hover, .chart-sub a:hover { text-decoration: underline; }
 .asof {
   display: inline-block; font-size: 12.5px; color: var(--ink-2);
@@ -62,7 +166,8 @@ h1 { font-size: clamp(22px, 4.5vw, 30px); margin: 0 0 6px; font-weight: 650; }
 
 /* ---- section headings ---- */
 h2 {
-  font-size: 17px; font-weight: 650; margin: 36px 0 4px;
+  font-family: var(--serif); color: var(--ink-serif);
+  font-size: 17px; font-weight: 600; margin: 36px 0 4px;
 }
 .section-note { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
 
@@ -80,7 +185,9 @@ h2 {
 .kpi .value { font-size: 28px; font-weight: 650; margin: 0; line-height: 1.2; }
 .kpi .value .unit { font-size: 15px; font-weight: 500; color: var(--ink-2); }
 .kpi .chips { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
-.kpi .foot { margin-top: 8px; font-size: 11.5px; color: var(--muted); }
+/* 12px, not 11.5. Page chrome rather than in-chart text, so arguably outside
+   the reach of the 12px floor — raised anyway to stop the argument. */
+.kpi .foot { margin-top: 8px; font-size: 12px; color: var(--muted); }
 
 /* variance chips — arrow + signed text, color never the only signal */
 .chip {
@@ -112,7 +219,10 @@ h2 {
      chart down to the narrower container. */
   min-width: 0;
 }
-.chart-card h3 { font-size: 14px; font-weight: 650; margin: 0 0 0 8px; }
+.chart-card h3 {
+  font-family: var(--serif); color: var(--ink-serif);
+  font-size: 14px; font-weight: 600; margin: 0 0 0 8px;
+}
 .chart-card .chart-sub { font-size: 12px; color: var(--muted); margin: 1px 0 4px 8px; }
 .chart { width: 100%; height: 260px; }
 
@@ -125,7 +235,7 @@ h2 {
 .method h2 { margin-top: 16px; }
 .method ul { padding-left: 1.2em; }
 .method li { margin: 7px 0; max-width: 88ch; }
-.method a { color: var(--s1); }
+.method a { color: var(--ink-s1); }
 /* Long XBRL tag names in <code> are single unbroken tokens; let them wrap so
    they never force horizontal scroll on a phone. */
 .method code { overflow-wrap: anywhere; }
