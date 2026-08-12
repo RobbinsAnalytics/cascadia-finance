@@ -255,11 +255,29 @@ _COLOUR_KEY = re.compile(r"\.(color|borderColor|backgroundColor|textBorderColor"
 _COLOUR_VALUE = re.compile(r'^"(#[0-9a-fA-F]{3,8}|rgba?\([^"]*\))"$')
 
 
-def is_colour_change(line: str) -> bool:
-    path, sep, value = line.partition(" = ")
-    if not sep:
-        return False
-    return bool(_COLOUR_KEY.search(path) and _COLOUR_VALUE.match(value.strip()))
+def is_colour_change(path: str, before: str, after: str) -> bool:
+    return bool(
+        _COLOUR_KEY.search(path)
+        and _COLOUR_VALUE.match(before.strip())
+        and _COLOUR_VALUE.match(after.strip())
+    )
+
+
+def as_map(lines: list[str]) -> dict[str, str]:
+    """`path = value` lines keyed by path.
+
+    Comparing as a set answers "did anything differ", which conflates three
+    very different events: a value that MOVED, a fact that VANISHED, and a
+    fact that was ADDED. Only the first two are defects. Phase 2 adds a data
+    table to q2-filed.html — new facts, no changed ones — and a set diff would
+    have reported that as damage.
+    """
+    out: dict[str, str] = {}
+    for line in lines:
+        path, sep, value = line.partition(" = ")
+        if sep:
+            out[path] = value
+    return out
 
 
 def flatten(fixture: dict) -> list[str]:
@@ -315,36 +333,50 @@ def main() -> int:
         prior = base / args.diff / "numeric-fixture.txt"
         if not prior.exists():
             sys.exit(f"no fixture to diff against at {prior}")
-        before = set(prior.read_text(encoding="utf-8").splitlines())
-        after = set(lines)
-        delta = sorted(before ^ after)
+        before = as_map(prior.read_text(encoding="utf-8").splitlines())
+        after = as_map(lines)
+
+        added = sorted(set(after) - set(before))
+        removed = sorted(set(before) - set(after))
+        moved = sorted(p for p in set(before) & set(after) if before[p] != after[p])
 
         # A reskin changes colours by definition, and peers.html carries
         # itemStyle.color INSIDE series.data — so a palette swap shows up as a
         # data delta. Reporting that as a numeric defect makes the gate cry
         # wolf on every phase, and a gate nobody believes is worse than none.
         #
-        # This classifies; it does not suppress. Both counts are always
-        # printed, and the test is deliberately narrow — a known colour key
-        # AND a hex or rgb() value. Anything else, including a colour key
-        # holding something that is not a colour, counts as a numeric defect.
-        # Widen this only with a reason.
+        # This classifies; it does not suppress. Every count is printed, and
+        # the test is deliberately narrow — a known colour key AND a hex or
+        # rgb() value on BOTH sides. A colour key whose value stopped being a
+        # colour still counts as a defect. Widen this only with a reason.
         #
         # Note this is the REPORTING half of the tool. EXTRACT_JS and flatten()
         # are untouched, so a fixture captured before this change still
         # compares against one captured after it.
-        colour_delta = [d for d in delta if is_colour_change(d)]
-        numeric_delta = [d for d in delta if not is_colour_change(d)]
+        recoloured = [p for p in moved if is_colour_change(p, before[p], after[p])]
+        defects = [p for p in moved if p not in set(recoloured)]
 
-        print(f"DIFF vs {args.diff}: {len(after)} facts, "
-              f"{len(colour_delta)} colour deltas, "
-              f"{len(numeric_delta)} numeric deltas")
+        print(f"DIFF vs {args.diff}: {len(after)} facts · "
+              f"{len(recoloured)} recoloured · {len(added)} added · "
+              f"{len(removed)} removed · {len(defects)} moved")
 
-        if numeric_delta:
-            print(f"\nNUMERIC DELTA — {len(numeric_delta)} lines:")
-            for line in numeric_delta[:60]:
-                print(f"  {'-' if line in before else '+'} {line}")
-            print("\nAny delta here is a defect, not a finding.")
+        # Added facts are not damage, but they are never silent either: new
+        # content on a page that promises fixed figures is exactly the thing a
+        # reviewer should lay eyes on.
+        if added:
+            print(f"\nADDED — {len(added)} new facts (not a defect; confirm each is intended):")
+            for p in added[:40]:
+                print(f"  + {p} = {after[p]}")
+            if len(added) > 40:
+                print(f"  … and {len(added) - 40} more")
+
+        if removed or defects:
+            print(f"\nDEFECTS — {len(removed)} removed, {len(defects)} values moved:")
+            for p in removed[:30]:
+                print(f"  - {p} = {before[p]}")
+            for p in defects[:30]:
+                print(f"  ~ {p}: {before[p]} -> {after[p]}")
+            print("\nAny line here is a defect, not a finding.")
             return 1
         print("\nNo number moved.")
     return 0

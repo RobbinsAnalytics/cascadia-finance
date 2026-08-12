@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <title>Robbins Analytics</title>
+  <!--
+    Robbins Analytics · primary favicon.
+    Chrome 80+, Firefox 41+ and Edge honour the media query and swap
+    palettes with browser chrome. Safari renders the SVG but ignores the
+    embedded query, which is why favicon-32.png ships alongside it as the
+    light-mode fallback. Order the <link> tags so the SVG wins where supported.
+  -->
+  <style>
+    .ctx  { fill: #828E88; }
+    .emph { fill: #1E7A4C; }
+    .base { fill: #232B27; }
+    @media (prefers-color-scheme: dark) {
+      .ctx  { fill: #67726C; }
+      .emph { fill: #65A583; }
+      .base { fill: #9AA6A0; }
+    }
+  </style>
+  <rect class="ctx"  x="1"  y="8"  width="4"  height="5"/>
+  <rect class="emph" x="6"  y="3"  width="4"  height="10"/>
+  <rect class="ctx"  x="11" y="10" width="4"  height="3"/>
+  <rect class="base" x="0"  y="13" width="16" height="2"/>
+</svg>

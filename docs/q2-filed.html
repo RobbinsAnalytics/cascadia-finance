@@ -22,18 +22,30 @@
 <meta property="og:url" content="https://www.robbinsanalytics.com/cascadia-finance/q2-filed.html">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://www.robbinsanalytics.com/cascadia-finance/assets/og-finance.png">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/cascadia.css">
+<!-- The Cascadia theme, vendored and local. This page still loads no chart
+     library and makes no network call: the theme registers an ECharts theme
+     only if ECharts is present, and everything used here — the provenance
+     strip, the access-layer helpers, the palette and the Rule 2.3.7 text inks
+     — is plain DOM work that stands on its own. -->
+<script src="assets/cascadia-echarts-theme.js"></script>
 <style>
   /* Additive only — reuses cascadia.css tokens, mirrors the read-through page. */
+  /* Tier and badges were four hand-picked hexes (#eef6ee, #bfe0bf, #d8ecd8,
+     #f5e6c4) from outside the system. Retokenised onto palette values: the
+     badge inks sit on paper rather than mist because evergreen ink measures
+     4.27:1 on mist and 5.18:1 on paper, and badge text owes 4.5:1. */
   .tier { border-radius: 10px; padding: 14px 18px; margin: 18px 0 6px; font-size: 13.5px; color: var(--ink-2); }
-  .tier.filed    { background: #eef6ee; border: 1px solid #bfe0bf; border-left: 5px solid var(--up-ink); }
-  .tier .badge { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .09em;
-    text-transform: uppercase; border-radius: 5px; padding: 3px 9px; margin-bottom: 8px; }
-  .badge.filed    { color: #14521a; background: #d8ecd8; }
-  .badge.announced{ color: #7a5200; background: #f5e6c4; }
+  .tier.filed    { background: var(--surface); border: 1px solid var(--ring); border-left: 5px solid var(--s1); }
+  .tier .badge { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .09em;
+    text-transform: uppercase; border-radius: 5px; padding: 3px 9px; margin-bottom: 8px;
+    background: var(--surface); border: 1px solid var(--grid); }
+  .badge.filed    { color: var(--ink-s1); }
+  .badge.announced{ color: var(--ink-s3); }
   .tier p { margin: 0 0 7px; max-width: 86ch; } .tier p:last-child { margin-bottom: 0; }
   .tier strong { color: var(--ink); }
-  .src { font-size: 11px; color: var(--muted); font-weight: 500; }
+  .src { font-size: 12px; color: var(--muted); font-weight: 500; }
   .kpi .src { display: block; margin-top: 6px; }
 
   .result { border-radius: 10px; padding: 16px 18px; margin: 14px 0; font-size: 14.5px;
@@ -45,15 +57,22 @@
   table.dt th:first-child, table.dt td:first-child { text-align: left; }
   table.dt thead th { color: var(--ink-2); font-weight: 600; border-bottom: 1px solid var(--baseline); }
   table.dt tbody tr:last-child td { border-bottom: none; }
-  .flag { font-size: 11px; font-weight: 700; border-radius: 5px; padding: 2px 8px; letter-spacing: .03em; }
+  .flag { font-size: 12px; font-weight: 700; border-radius: 5px; padding: 2px 8px; letter-spacing: .03em; }
   .flag.match { color: var(--up-ink); background: var(--up-bg); }
   .flag.differs { color: var(--down-ink); background: var(--down-bg); }
   .flag.not_comparable { color: var(--flat-ink); background: var(--flat-bg); }
   .tablewrap { background: var(--surface); border: 1px solid var(--ring); border-radius: 10px; padding: 6px 18px 12px; margin-top: 14px; }
-  .tablewrap h3 { font-size: 14px; font-weight: 650; margin: 12px 0 0; }
+  .tablewrap h3 { font-family: var(--serif); color: var(--ink-serif); font-size: 14px; font-weight: 600; margin: 12px 0 0; }
   .tablewrap .chart-sub { font-size: 12px; color: var(--muted); margin: 1px 0 2px; }
   .method code { overflow-wrap: anywhere; }
   #walk svg { max-width: 100%; height: auto; display: block; }
+
+  /* Rule 5.1 layer 2 — the chart's data as a table. In a <details> so it does
+     not compete with the chart visually, but always in the DOM, which is what
+     aria-describedby and a screen reader need. */
+  .datatable { margin: 10px 0 0; font-size: 13px; }
+  .datatable summary { color: var(--ink-2); cursor: default; padding: 4px 0; }
+  .datatable summary:hover { color: var(--ink); }
 </style>
 </head>
 <body>
@@ -111,7 +130,19 @@
   <h2>The gross-profit walk — on filed figures</h2>
   <p class="section-note">Phase 2 method: Δgross profit splits into a revenue effect (Δrevenue × prior-quarter GM%)
     and a margin effect (ΔGM% × current revenue). Applied to the <em>filed</em> Q1→Q2 numbers.</p>
-  <div class="chart-card" style="max-width:none;"><div id="walk"></div></div>
+  <div class="chart-card" style="max-width:none;">
+    <!-- Rule 3.1: the title states the finding, the subtitle names the metric.
+         Every figure in the title is already rendered on this page — $44.1M in
+         the callout below, and the $31.8M margin effect against the $12.3M
+         revenue effect as labels on the bars themselves (check K2). -->
+    <h3 id="walk-title">Margin, more than volume, drove the $44.1M gross-profit gain</h3>
+    <p class="chart-sub" id="walk-sub">Q1 → Q2 FY2026 gross profit, $M, GAAP as filed</p>
+    <div id="walk"></div>
+    <details class="datatable">
+      <summary>Gross-profit walk — data table</summary>
+      <table class="dt" id="walk-table"></table>
+    </details>
+  </div>
   <ul class="callouts" id="walk-notes"></ul>
 
   <!-- restructuring resolution -->
@@ -238,29 +269,122 @@ document.getElementById("m-8k").textContent = D.eightk_accession;
     { label: "Margin effect", base: q1.gross_profit + w.revenue_effect, val: w.margin_effect, total: false },
     { label: "Q2 gross profit", base: 0, val: q2.gross_profit, total: true }
   ];
-  var W = 680, H = 250, padL = 8, padR = 8, padT = 16, padB = 46, n = steps.length;
-  var maxV = q2.gross_profit * 1.12, plotH = H - padT - padB, plotW = W - padL - padR;
-  var bw = plotW / n * 0.56, gap = plotW / n;
+  /* THE VIEWBOX IS MEASURED, NOT FIXED. Read this before changing W.
+     A fixed 680-wide viewBox with max-width:100% scales the whole drawing
+     down to fit, text included — at a 320px canvas the 12px labels rendered
+     at about 5.4 CSS px. Rule 5.3's 12px floor is INVARIANT and WCAG 1.4.10
+     tests at exactly 320, so raising the font-size number while the viewBox
+     still scaled would have been a fix on paper only.
+     Setting the viewBox width to the container's real pixel width makes the
+     scale factor 1, so 12 SVG units are 12 CSS px at every width. That is
+     also what keeps Rule 2.3.6 satisfied at 320: Rain is legal only while its
+     direct labels are legible, and a 5px label is not a label. */
+  var H = 260, padL = 8, padR = 8, padT = 16, padB = 56, n = steps.length;
+  var maxV = q2.gross_profit * 1.12, plotH = H - padT - padB;
+  var host = document.getElementById("walk");
   var css = getComputedStyle(document.documentElement), tok = function (k) { return css.getPropertyValue(k).trim(); };
-  var colTotal = tok("--baseline"), colRev = tok("--s1"), colMar = tok("--s2"), ink = tok("--ink-2"), grid = tok("--grid");
+  /* The two totals are context, not a third encoded category, so they take
+     Rain. They were --baseline, which measured 1.75:1 before the palette swap
+     and 1.21:1 after it — both under the 3:1 a mark owes. Rain is 2.45:1 and
+     legal only under Rule 2.3.6's written exception, which requires a direct
+     text label at 4.5:1 on every series it colours. Every bar here carries its
+     value above it and its name below it, at the inks on the next line. Do not
+     remove either label to save space: they are what makes the hue legal. */
+  var colTotal = tok("--rain"), colRev = tok("--s1"), colMar = tok("--s2");
+  var inkTotal = tok("--ink"), inkRev = tok("--ink-s1"), inkMar = tok("--ink-s2");
+  var ink2 = tok("--ink-2"), grid = tok("--grid"), sans = tok("--sans");
   function y(v) { return padT + plotH - (v / maxV) * plotH; }
-  var svg = ['<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Gross-profit bridge, Q1 to Q2 FY2026, filed">'];
-  svg.push('<line x1="' + padL + '" y1="' + y(0) + '" x2="' + (W - padR) + '" y2="' + y(0) + '" stroke="' + grid + '"/>');
-  steps.forEach(function (s, i) {
-    var cx = padL + gap * i + (gap - bw) / 2;
-    var top = y(s.base + Math.max(s.val, 0)), bot = y(s.base + Math.min(s.val, 0));
-    var col = s.total ? colTotal : (i === 1 ? colRev : colMar);
-    svg.push('<rect x="' + cx.toFixed(1) + '" y="' + top.toFixed(1) + '" width="' + bw.toFixed(1) +
-      '" height="' + Math.max(2, bot - top).toFixed(1) + '" rx="3" fill="' + col + '"/>');
-    svg.push('<text x="' + (cx + bw / 2).toFixed(1) + '" y="' + (top - 6).toFixed(1) + '" text-anchor="middle" ' +
-      'font-size="12" font-weight="600" fill="' + ink + '">' + (s.total ? "" : "+") + "$" + s.val.toFixed(1) + 'M</text>');
-    s.label.split(" ").forEach(function (word, k) {
-      svg.push('<text x="' + (cx + bw / 2).toFixed(1) + '" y="' + (H - padB + 16 + k * 13) + '" text-anchor="middle" ' +
-        'font-size="11" fill="' + ink + '">' + esc(word) + '</text>');
+
+  function draw() {
+    /* Floored, for the same reason cascadiaResize defers: a container that is
+       hidden or not yet laid out reports 0, and a zero-width chart that is
+       never redrawn never recovers. */
+    var W = Math.max(280, host.clientWidth || 680);
+    var plotW = W - padL - padR, bw = plotW / n * 0.56, gap = plotW / n;
+    /* aria-hidden because the host div carries role="img" and the authored
+       label (cascadiaAccessible, below), and the data table carries the
+       values. Two accessible names on nested elements is worse than one good
+       one. width/height are set so the viewBox never scales the text. */
+    var svg = ['<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H +
+      '" aria-hidden="true" focusable="false" font-family="' + esc(sans) + '">'];
+    svg.push('<line x1="' + padL + '" y1="' + y(0) + '" x2="' + (W - padR) + '" y2="' + y(0) + '" stroke="' + grid + '"/>');
+    steps.forEach(function (s, i) {
+      var cx = padL + gap * i + (gap - bw) / 2;
+      var top = y(s.base + Math.max(s.val, 0)), bot = y(s.base + Math.min(s.val, 0));
+      var col = s.total ? colTotal : (i === 1 ? colRev : colMar);
+      /* Rule 2.3.7 — the label takes the hue's TEXT ink, so it clears 4.5:1
+         while the mark keeps its full value and the two stay identifiably the
+         same series. Rule 2.5 — no rounded caps. */
+      var lab = s.total ? inkTotal : (i === 1 ? inkRev : inkMar);
+      svg.push('<rect x="' + cx.toFixed(1) + '" y="' + top.toFixed(1) + '" width="' + bw.toFixed(1) +
+        '" height="' + Math.max(2, bot - top).toFixed(1) + '" fill="' + col + '"/>');
+      svg.push('<text x="' + (cx + bw / 2).toFixed(1) + '" y="' + (top - 6).toFixed(1) + '" text-anchor="middle" ' +
+        'font-size="12" font-weight="600" fill="' + lab + '">' + (s.total ? "" : "+") + "$" + s.val.toFixed(1) + 'M</text>');
+      s.label.split(" ").forEach(function (word, k) {
+        svg.push('<text x="' + (cx + bw / 2).toFixed(1) + '" y="' + (H - padB + 16 + k * 14) + '" text-anchor="middle" ' +
+          'font-size="12" fill="' + ink2 + '">' + esc(word) + '</text>');
+      });
     });
-  });
-  svg.push('</svg>');
-  document.getElementById("walk").innerHTML = svg.join("");
+    svg.push('</svg>');
+    host.innerHTML = svg.join("");
+  }
+  draw();
+
+  /* Redraw on container resize rather than on window resize: the card can
+     change width without the window doing anything (the grid reflows), and a
+     window listener would miss it. setTimeout, not requestAnimationFrame —
+     rAF does not fire while the container is hidden, which is the one case
+     this exists for. */
+  if (typeof ResizeObserver === "function") {
+    var pending = null;
+    new ResizeObserver(function () {
+      if (pending !== null) clearTimeout(pending);
+      pending = setTimeout(function () { pending = null; if (host.clientWidth) draw(); }, 0);
+    }).observe(host);
+  }
+
+  /* Rule 5.1 layer 2 — the same four values as a table. It restates what the
+     bars already print; no figure here is absent from the chart. */
+  document.getElementById("walk-table").innerHTML =
+    "<thead><tr><th>Step</th><th>Value</th></tr></thead><tbody>" +
+    steps.map(function (s) {
+      return "<tr><td>" + esc(s.label) + "</td><td>" +
+        (s.total ? "" : "+") + "$" + s.val.toFixed(1) + "M</td></tr>";
+    }).join("") + "</tbody>";
+
+  /* Rules 4.2, 5.1 — provenance strip and the access layers. Built from the
+     same `steps` array the chart draws from, so the spoken values cannot drift
+     away from the printed ones. Guarded: if the theme ever fails to load, the
+     chart and table still render. */
+  if (typeof CASCADIA !== "undefined") {
+    /* L1 + L2 only — form, encoding, units, then the values. No
+       interpretation: blind readers ranked that among the least useful
+       description content, so the finding stays in the visible title. */
+    CASCADIA.accessible("walk", {
+      tableId: "walk-table",
+      label: "Waterfall chart. Gross profit in millions of dollars, Q1 to Q2 " +
+        "FY2026, GAAP as filed. Four bars, left to right: " +
+        steps.map(function (s) {
+          return s.label + " " + (s.total ? "" : "plus ") + "$" + s.val.toFixed(1) + " million";
+        }).join("; ") + "."
+    });
+    /* Layer 3 — one tab stop, arrow keys inside it. */
+    CASCADIA.navigator("walk", {
+      label: "Gross-profit walk, four steps.",
+      series: [{
+        name: "Gross-profit walk",
+        summary: "Q1 gross profit, revenue effect, margin effect, Q2 gross profit",
+        points: steps.map(function (s) {
+          return { label: s.label, value: (s.total ? "" : "+") + "$" + s.val.toFixed(1) + "M" };
+        })
+      }]
+    });
+    CASCADIA.provenance("walk", {
+      source: "SEC EDGAR — Q2 FY2026 10-Q XBRL, accession " + D.tenq_accession,
+      asOf: D.as_of_filed,
+      flags: "GAAP as filed, no adjustments"
+    });
+  }
   document.getElementById("walk-notes").innerHTML = [
     "<li>Gross profit rose <strong>" + signed(w.total, "M") + "</strong>, from " + fmtM(q1.gross_profit) +
       " to " + fmtM(q2.gross_profit) + " — on the <em>filed</em> figures.</li>",
