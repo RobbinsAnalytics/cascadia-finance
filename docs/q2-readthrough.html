@@ -28,24 +28,31 @@
 <meta property="og:url" content="https://www.robbinsanalytics.com/cascadia-finance/q2-readthrough.html">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://www.robbinsanalytics.com/cascadia-finance/assets/og-finance.png">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/cascadia.css">
 <style>
   /* Additive only — nothing here overrides cascadia.css tokens. */
+  /* Was four hand-picked hexes (#fdf8ec, #e8d6a8, #c98500, #f5e6c4) from
+     outside the system. Retokenised onto Madrona, the alert slot — this is
+     the announced tier, the one the reader is being asked to treat as
+     provisional. Badge ink sits on paper rather than mist: Madrona ink is
+     3.75:1 on mist and 4.55:1 on paper, and badge text owes 4.5:1. */
   .tier {
-    background: #fdf8ec; border: 1px solid #e8d6a8; border-left: 5px solid #c98500;
+    background: var(--surface); border: 1px solid var(--ring); border-left: 5px solid var(--s3);
     border-radius: 10px; padding: 14px 18px; margin: 18px 0 6px;
     font-size: 13.5px; color: var(--ink-2);
   }
   .tier .badge {
-    display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .09em;
-    text-transform: uppercase; color: #7a5200; background: #f5e6c4;
+    display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .09em;
+    text-transform: uppercase; color: var(--ink-s3);
+    background: var(--surface); border: 1px solid var(--grid);
     border-radius: 5px; padding: 3px 9px; margin-bottom: 8px;
   }
   .tier p { margin: 0 0 7px; max-width: 86ch; }
   .tier p:last-child { margin-bottom: 0; }
   .tier strong { color: var(--ink); }
 
-  .src { font-size: 11px; color: var(--muted); font-weight: 500; }
+  .src { font-size: 12px; color: var(--muted); font-weight: 500; }
   .kpi .src { display: block; margin-top: 6px; }
 
   table.dt {
@@ -67,7 +74,7 @@
     background: var(--surface); border: 1px solid var(--ring);
     border-radius: 10px; padding: 6px 18px 10px; margin-top: 14px;
   }
-  .tablewrap h3 { font-size: 14px; font-weight: 650; margin: 12px 0 0; }
+  .tablewrap h3 { font-family: var(--serif); color: var(--ink-serif); font-size: 14px; font-weight: 600; margin: 12px 0 0; }
   .tablewrap .chart-sub { font-size: 12px; color: var(--muted); margin: 1px 0 2px; }
   .gap-list li { margin: 9px 0; max-width: 88ch; }
   .chart { height: 285px; }
@@ -210,7 +217,11 @@
   <div class="tablewrap">
     <h3>Table view</h3>
     <p class="chart-sub">All figures $M except margins. Q1 filed (XBRL); Q2 announced (press release).</p>
-    <table class="dt">
+    <!-- The swatches were literal hexes (#2a78d6, #008300, #e87ba4) — the old
+         series values, copied by hand. The palette swap moved the charts and
+         left these behind, so each swatch pointed at a colour its series no
+         longer used. They read from the tokens now and cannot desync again. -->
+    <table class="dt" id="rt-table">
       <thead>
         <tr><th>Measure</th><th>Q1 FY2026 <span class="src">filed</span></th><th>Q2 FY2026 <span class="src">announced</span></th><th>Change</th></tr>
       </thead>
@@ -219,10 +230,10 @@
         <tr><td>Gross profit</td><td>86.79</td><td>130.92</td><td class="tot">+44.13</td></tr>
         <tr><td>&nbsp;&nbsp;of which revenue effect</td><td>—</td><td>—</td><td>+12.30</td></tr>
         <tr><td>&nbsp;&nbsp;of which margin effect</td><td>—</td><td>—</td><td>+31.83</td></tr>
-        <tr><td><span class="swatch" style="background:#2a78d6"></span>GAAP gross margin</td><td>38.38%</td><td>50.71%</td><td>+12.33 pts</td></tr>
+        <tr><td><span class="swatch" style="background:var(--s1)"></span>GAAP gross margin</td><td>38.38%</td><td>50.71%</td><td>+12.33 pts</td></tr>
         <tr><td>Restructuring in cost of revenue</td><td>21.50</td><td>4.29</td><td>−17.21</td></tr>
-        <tr><td><span class="swatch" style="background:#008300"></span>Gross margin ex-restructuring</td><td>47.89%</td><td>52.37%</td><td>+4.48 pts</td></tr>
-        <tr><td><span class="swatch" style="background:#e87ba4"></span>Gross margin, company non-GAAP</td><td>49.00%</td><td>53.30%</td><td>+4.30 pts</td></tr>
+        <tr><td><span class="swatch" style="background:var(--s2)"></span>Gross margin ex-restructuring</td><td>47.89%</td><td>52.37%</td><td>+4.48 pts</td></tr>
+        <tr><td><span class="swatch" style="background:var(--s3)"></span>Gross margin, company non-GAAP</td><td>49.00%</td><td>53.30%</td><td>+4.30 pts</td></tr>
         <tr><td>Diluted EPS (GAAP)</td><td>$0.26</td><td>$0.71</td><td>+$0.45</td></tr>
       </tbody>
     </table>
@@ -295,7 +306,12 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<!-- Pinned. This was echarts@5, a floating tag: the rendering of a page whose
+     whole proposition is that its figures are fixed could change without a
+     commit. The other three reports have always pinned 5.6.0. -->
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
+<!-- Local, and after ECharts so registerTheme('cascadia') finds it. -->
+<script src="assets/cascadia-echarts-theme.js"></script>
 <script>
 /* ==========================================================================
    CASCADIA_DATA — frozen values inlined at author time. No network calls at
@@ -319,12 +335,16 @@ var CASCADIA_DATA = {
   var tok  = function (n) { return css.getPropertyValue(n).trim(); };
   var INK2 = tok("--ink-2"), MUTED = tok("--muted"), GRID = tok("--grid"),
       BASE = tok("--baseline"), S1 = tok("--s1"), S2 = tok("--s2"), S3 = tok("--s3"),
-      SURF = tok("--surface");
+      RAIN = tok("--rain"), SURF = tok("--surface");
+  /* Rule 2.3.7 — marks take the palette value, text takes the ink. */
+  var I1 = tok("--ink-s1"), I2 = tok("--ink-s2"), I3 = tok("--ink-s3"), INK = tok("--ink");
 
+  /* 12px, not 11 — Rule 5.3's floor is INVARIANT and applies to every string
+     inside a chart, axis labels included. */
   var axisCommon = {
     axisLine:  { lineStyle: { color: BASE } },
     axisTick:  { show: false },
-    axisLabel: { color: MUTED, fontSize: 11 }
+    axisLabel: { color: MUTED, fontSize: 12 }
   };
   var D = CASCADIA_DATA;
 
@@ -332,9 +352,15 @@ var CASCADIA_DATA = {
   var base = [0, D.q1.gross_profit, D.q1.gross_profit + D.walk.revenue_effect, 0];
   var vals = [D.q1.gross_profit, D.walk.revenue_effect, D.walk.margin_effect, D.q2.gross_profit];
   var cats = ["Q1 FY26\ngross profit", "Revenue\neffect", "Margin\neffect", "Q2 FY26\ngross profit"];
-  var colr = [BASE, S1, S2, BASE];
+  /* The two totals are context rather than a third encoded category, so they
+     take Rain. They were --baseline, which is mist since the palette swap and
+     measures 1.21:1 — invisible as a mark. Rain is 2.45:1, legal under
+     2.3.6's written exception because every bar carries a direct value label
+     at 4.5:1. Do not remove those labels to save room. */
+  var colr = [RAIN, S1, S2, RAIN];
+  var labelInk = [INK, I1, I2, INK];
 
-  var c1 = echarts.init(document.getElementById("c1"), null, { renderer: "svg" });
+  var c1 = echarts.init(document.getElementById("c1"), "cascadia", { renderer: "svg" });
   c1.setOption({
     backgroundColor: SURF,
     grid: { left: 46, right: 16, top: 26, bottom: 44 },
@@ -350,19 +376,23 @@ var CASCADIA_DATA = {
       }
     },
     xAxis: Object.assign({ type: "category", data: cats }, axisCommon,
-      { axisLabel: { color: INK2, fontSize: 11, lineHeight: 14, interval: 0 } }),
-    yAxis: Object.assign({ type: "value", name: "$M", nameTextStyle: { color: MUTED, fontSize: 11 },
+      { axisLabel: { color: INK2, fontSize: 12, lineHeight: 15, interval: 0 } }),
+    yAxis: Object.assign({ type: "value", name: "$M", nameTextStyle: { color: MUTED, fontSize: 12 },
       splitLine: { lineStyle: { color: GRID } } }, axisCommon),
     series: [
       { name: "base", type: "bar", stack: "w", silent: true,
         itemStyle: { color: "transparent" }, emphasis: { disabled: true }, data: base },
       { name: "value", type: "bar", stack: "w", barWidth: "46%",
+        /* Rule 2.5 — flat marks, square caps. borderRadius was [4,4,0,0]. */
         itemStyle: {
-          borderRadius: [4, 4, 0, 0],
+          borderRadius: 0,
           color: function (p) { return colr[p.dataIndex]; }
         },
         label: {
-          show: true, position: "top", fontSize: 11.5, fontWeight: 600, color: INK2,
+          show: true, position: "top", fontSize: 12, fontWeight: 600,
+          /* Colour-matched to the bar at text contrast, per 2.3.7 — the mark
+             keeps its full value, the label clears 4.5:1. */
+          color: function (p) { return labelInk[p.dataIndex]; },
           formatter: function (p) {
             var i = p.dataIndex;
             return (i === 0 || i === 3 ? "" : "+") + "$" + vals[i].toFixed(1) + "M";
@@ -381,15 +411,24 @@ var CASCADIA_DATA = {
      would collide. Exact values live in the table view below. The dy offsets are
      fixed, not automatic, so the labels cannot overlap at any width. */
   var xs = [D.q1.label, D.q2.label];
-  var mk = function (name, color, data, dy) {
+  var mk = function (name, color, ink, data, dy) {
     return {
-      name: name, type: "line", data: data, symbol: "circle", symbolSize: 9,
+      /* showSymbol is explicit because the theme turns symbols off by default
+         — a sensible default for a dense trend line, wrong for a two-point
+         slope chart where the endpoints ARE the reading. Adopting the theme
+         silently removed these markers; nothing in the numeric fixture would
+         have caught it. */
+      name: name, type: "line", data: data, symbol: "circle", symbolSize: 9, showSymbol: true,
       lineStyle: { width: 2, color: color },
       itemStyle: { color: color, borderColor: SURF, borderWidth: 2 },
       label: { show: false },
       endLabel: {
-        show: true, distance: 10, offset: [0, dy], fontSize: 11, fontWeight: 600,
-        color: INK2,
+        show: true, distance: 10, offset: [0, dy], fontSize: 12, fontWeight: 600,
+        /* Was one grey for all three. Colour-matched to its own line at text
+           contrast (2.3.7), so the label ties to its series by hue as well as
+           by position — and still carries the name, so hue is never the only
+           channel. */
+        color: ink,
         formatter: function () {
           var d = data[1] - data[0];
           return name + "  " + (d >= 0 ? "+" : "") + d.toFixed(1) + " pts";
@@ -397,14 +436,15 @@ var CASCADIA_DATA = {
       }
     };
   };
-  var c2 = echarts.init(document.getElementById("c2"), null, { renderer: "svg" });
+  var c2 = echarts.init(document.getElementById("c2"), "cascadia", { renderer: "svg" });
   c2.setOption({
     backgroundColor: SURF,
     grid: { left: 44, right: 132, top: 26, bottom: 40 },
-    legend: {
-      show: true, bottom: 0, itemWidth: 14, itemHeight: 8, icon: "roundRect",
-      textStyle: { color: INK2, fontSize: 11 }
-    },
+    /* Rule 3.6 — legend removed. Every series already ends in a direct label
+       carrying its name and its change in points, so the legend restated the
+       same three names in the same three colours and cost a row of height at
+       320px for nothing. */
+    legend: { show: false },
     tooltip: {
       trigger: "axis",
       axisPointer: { type: "line", lineStyle: { color: BASE, width: 1 } },
@@ -413,14 +453,69 @@ var CASCADIA_DATA = {
     xAxis: Object.assign({ type: "category", boundaryGap: false, data: xs }, axisCommon,
       { axisLabel: { color: INK2, fontSize: 11 } }),
     yAxis: Object.assign({ type: "value", min: 36, max: 56, interval: 5,
-      axisLabel: { color: MUTED, fontSize: 11, formatter: "{value}%" },
+      axisLabel: { color: MUTED, fontSize: 12, formatter: "{value}%" },
       splitLine: { lineStyle: { color: GRID } } }, axisCommon),
     series: [
-      mk("GAAP", S1, [D.q1.gm, D.q2.gm], 4),
-      mk("ex-restr.", S2, [D.normalized.q1, D.normalized.q2], 1),
-      mk("non-GAAP", S3, [D.q1.gm_nongaap, D.q2.gm_nongaap], -7)
+      mk("GAAP", S1, I1, [D.q1.gm, D.q2.gm], 4),
+      mk("ex-restr.", S2, I2, [D.normalized.q1, D.normalized.q2], 1),
+      mk("non-GAAP", S3, I3, [D.q1.gm_nongaap, D.q2.gm_nongaap], -7)
     ]
   });
+
+  /* ---- Rules 4.2 and 5.1 — provenance and the three access layers --------
+     Labels are built from the same arrays the charts plot, so what a screen
+     reader is told cannot drift from what is drawn. L1 + L2 only: form,
+     encoding, units, then the values. The finding stays in the visible
+     heading — domain interpretation ranked among the least useful things to
+     put in a description. Both charts point at the one table view already on
+     the page, which carries every figure in both of them. */
+  if (typeof CASCADIA !== "undefined") {
+    var SRC = "SEC EDGAR — Q1 FY2026 10-Q XBRL (filed) and Q2 FY2026 8-K EX-99.1 (announced)";
+
+    CASCADIA.accessible("c1", {
+      tableId: "rt-table",
+      label: "Waterfall chart. Gross profit in millions of dollars, Q1 to Q2 FY2026. " +
+        "Four bars, left to right: " + cats.map(function (c, i) {
+          return c.replace("\n", " ") + " " + (i === 0 || i === 3 ? "" : "plus ") +
+                 "$" + vals[i].toFixed(1) + " million";
+        }).join("; ") + "."
+    });
+    CASCADIA.navigator("c1", {
+      chart: c1, label: "Gross-profit bridge, four steps.",
+      series: [{ name: "Gross-profit bridge", points: cats.map(function (c, i) {
+        return { label: c.replace("\n", " "),
+                 value: (i === 0 || i === 3 ? "" : "+") + "$" + vals[i].toFixed(1) + "M",
+                 seriesIndex: 1, dataIndex: i };
+      }) }]
+    });
+    CASCADIA.provenance("c1", { source: SRC, asOf: "2026-07-29", flags: "GAAP, no adjustments" });
+
+    var bases = [
+      { name: "GAAP", data: [D.q1.gm, D.q2.gm] },
+      { name: "ex-restructuring", data: [D.normalized.q1, D.normalized.q2] },
+      { name: "company non-GAAP", data: [D.q1.gm_nongaap, D.q2.gm_nongaap] }
+    ];
+    CASCADIA.accessible("c2", {
+      tableId: "rt-table",
+      label: "Slope chart. Gross margin as a percentage of revenue, " + xs[0] + " to " + xs[1] +
+        ", on three bases. Vertical axis 36 to 56 percent. " + bases.map(function (b) {
+          return b.name + " " + b.data[0].toFixed(1) + " percent to " + b.data[1].toFixed(1) + " percent";
+        }).join("; ") + "."
+    });
+    CASCADIA.navigator("c2", {
+      chart: c2, label: "Gross margin on three bases, two quarters each.",
+      series: bases.map(function (b, si) {
+        return { name: b.name,
+                 summary: (b.data[1] - b.data[0] >= 0 ? "up " : "down ") +
+                          Math.abs(b.data[1] - b.data[0]).toFixed(1) + " points",
+                 points: b.data.map(function (v, di) {
+                   return { label: xs[di], value: v.toFixed(1) + "%", seriesIndex: si, dataIndex: di };
+                 }) };
+      })
+    });
+    CASCADIA.provenance("c2", { source: SRC, asOf: "2026-07-29",
+      flags: "GAAP, ex-restructuring and company non-GAAP bases" });
+  }
 
   var ro = new ResizeObserver(function () { c1.resize(); c2.resize(); });
   ro.observe(document.getElementById("c1"));
