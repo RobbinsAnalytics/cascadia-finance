@@ -12,8 +12,11 @@
 <meta property="og:url" content="https://www.robbinsanalytics.com/cascadia-finance/peers.html">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://www.robbinsanalytics.com/cascadia-finance/assets/og-finance.png">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/cascadia.css">
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
+<!-- Local, and after ECharts so registerTheme('cascadia') finds it. -->
+<script src="assets/cascadia-echarts-theme.js"></script>
 </head>
 <body>
 
@@ -81,6 +84,30 @@
     <div style="overflow-x:auto;margin-top:8px;">
       <table id="tagmap-table" style="border-collapse:collapse;font-size:12px;white-space:nowrap;"></table>
     </div>
+  </section>
+
+  <!-- ===================== DATA TABLES ===================== -->
+  <!-- Rule 5.1 layer 2. Nothing on this page tabulated the values the seven
+       charts plot — the only table here maps XBRL tags. These two carry the
+       snapshot metrics behind the four ranked bars and the scatter, and the
+       two time series behind the trend charts. Placed after the tag map on
+       purpose: inserting them earlier would renumber it in the numeric
+       fixture for no reason. -->
+  <section aria-label="Peer data tables">
+    <h2>Peer data tables</h2>
+    <p class="section-note">The same values the charts above plot. “—” marks a metric a company does not tag.</p>
+    <details>
+      <summary style="cursor:pointer;color:var(--ink-2);font-size:14px;">Show snapshot table</summary>
+      <div style="overflow-x:auto;margin-top:10px;">
+        <table id="peer-snapshot-table" style="border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums;white-space:nowrap;"></table>
+      </div>
+    </details>
+    <details>
+      <summary style="cursor:pointer;color:var(--ink-2);font-size:14px;">Show trend table</summary>
+      <div style="overflow-x:auto;margin-top:10px;">
+        <table id="peer-trend-table" style="border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums;white-space:nowrap;"></table>
+      </div>
+    </details>
   </section>
 
   <section class="method" aria-label="Data and method">
@@ -175,7 +202,14 @@ function barColor(tk) {
   if (isSubject(tk)) return {color: css("--s1")};                 // FormFactor — accent
   if (isRef(tk)) return {color: "transparent", borderColor: css("--muted"),
                          borderWidth: 1.5, borderType: "dashed"}; // KLA — outlined reference
-  return {color: "#a7b0b8"};                                      // peers — neutral
+  /* Rain, from the token. Was #a7b0b8 here and #aab2ba in render() — two
+     different hand-picked greys for one role, neither in the palette, and
+     both weaker than Rain (2.09:1 vs 2.45:1). Rain is de-emphasis, NOT a
+     fourth encoded slot, so this chart encodes ONE category and sits well
+     inside 2.3.5's cap of four. It is legal only while every Rain series
+     carries a direct text label at 4.5:1 — Rule 2.3.6's written exception,
+     and the condition is load-bearing, not decoration. */
+  return {color: css("--rain")};
 }
 const nameOf = tk => CO[tk].label + (isRef(tk) ? " (ref)" : "");
 
@@ -187,20 +221,21 @@ function rankedBar(id, metric, fmt, opts = {}) {
   const data = TICKERS.filter(tk => val(tk, metric) != null)
     .map(tk => ({tk, v: val(tk, metric)}))
     .sort((a, b) => opts.asc ? a.v - b.v : b.v - a.v);
-  const c = echarts.init(el, null, {renderer: "canvas"});
+  const c = echarts.init(el, "cascadia", {renderer: "canvas"});
   c.setOption({
+    aria: {enabled: false},   // ECharts overwrites the authored label; see q2-readthrough
     grid: {left: 8, right: 54, top: 6, bottom: 4, containLabel: true},
-    xAxis: {type: "value", axisLabel: {color: css("--muted"), fontSize: 10, formatter: fmt},
+    xAxis: {type: "value", axisLabel: {color: css("--muted"), fontSize: 12, formatter: fmt},
             splitLine: {lineStyle: {color: css("--grid")}}},
     yAxis: {type: "category", inverse: true, data: data.map(d => nameOf(d.tk)),
             axisTick: {show: false}, axisLine: {lineStyle: {color: css("--baseline")}},
-            axisLabel: {color: css("--ink-2"), fontSize: 11}},
+            axisLabel: {color: css("--ink-2"), fontSize: 12}},
     tooltip: {trigger: "item", confine: true, backgroundColor: "#fff", borderColor: css("--grid"),
       textStyle: {color: css("--ink-2"), fontSize: 12},
       formatter: p => `<b>${data[p.dataIndex].tk} · ${CO[data[p.dataIndex].tk].label}</b><br>${fmt(data[p.dataIndex].v)}`},
     series: [{type: "bar", data: data.map(d => ({value: d.v, itemStyle: {...barColor(d.tk), borderRadius: 2}})),
       barMaxWidth: 18,
-      label: {show: true, position: "right", color: css("--ink-2"), fontSize: 10.5,
+      label: {show: true, position: "right", color: css("--ink-2"), fontSize: 12,
         formatter: p => fmt(p.value)}}],
   });
   return c;
@@ -215,7 +250,8 @@ function rankedBar(id, metric, fmt, opts = {}) {
   }
   const charts = [];
   const s1 = css("--s1"), muted = css("--muted"), grid = css("--grid"),
-        baseline = css("--baseline"), ink2 = css("--ink-2"), peerGrey = "#aab2ba";
+        baseline = css("--baseline"), ink2 = css("--ink-2"), peerGrey = css("--rain"),
+        inkS1 = css("--ink-s1"), ink = css("--ink");
 
   charts.push(rankedBar("rank-revenue", "revenue", fmtRev));
   charts.push(rankedBar("rank-gm", "gross_margin_pct", v => v.toFixed(1) + "%"));
@@ -226,16 +262,24 @@ function rankedBar(id, metric, fmt, opts = {}) {
   const pts = TICKERS.filter(tk => val(tk, "operating_margin_pct") != null && growthAt(tk) != null)
     .map(tk => ({tk, x: growthAt(tk), y: val(tk, "operating_margin_pct"), rev: val(tk, "revenue")}));
   const maxRev = Math.max(...pts.map(p => p.rev));
-  const sc = echarts.init(document.getElementById("scatter"), null, {renderer: "canvas"});
+  const sc = echarts.init(document.getElementById("scatter"), "cascadia", {renderer: "canvas"});
   sc.setOption({
-    grid: {left: 8, right: 16, top: 10, bottom: 30, containLabel: true},
-    xAxis: {name: "YoY revenue growth", nameLocation: "middle", nameGap: 24,
-      nameTextStyle: {color: muted, fontSize: 11}, type: "value",
-      axisLabel: {color: muted, fontSize: 10, formatter: v => v + "%"},
+    aria: {enabled: false},
+    /* left/top were 8/10 with containLabel, which reserves room for axis
+       LABELS but not the axis NAME — so "Operating margin" was clipped off
+       the left edge, and Teradyne's label, sitting at 36.9% against a 40%
+       axis top, was clipped off the top. That label is the compensating
+       condition that makes Rain legal here, so losing it is not cosmetic. */
+    grid: {left: 54, right: 20, top: 28, bottom: 34},
+    xAxis: {name: "YoY revenue growth", nameLocation: "middle", nameGap: 26,
+      nameTextStyle: {color: muted, fontSize: 12}, type: "value",
+      axisLabel: {color: muted, fontSize: 12, formatter: v => v + "%"},
       splitLine: {lineStyle: {color: grid}}, axisLine: {lineStyle: {color: baseline}}},
-    yAxis: {name: "Operating margin", nameLocation: "middle", nameGap: 34,
-      nameTextStyle: {color: muted, fontSize: 11}, type: "value",
-      axisLabel: {color: muted, fontSize: 10, formatter: v => v + "%"},
+    yAxis: {name: "Operating margin", nameLocation: "middle", nameGap: 40,
+      nameTextStyle: {color: muted, fontSize: 12}, type: "value",
+      /* Headroom so the topmost point's direct label is never clipped. */
+      max: v => Math.ceil((v.max + 6) / 5) * 5,
+      axisLabel: {color: muted, fontSize: 12, formatter: v => v + "%"},
       splitLine: {lineStyle: {color: grid}}},
     tooltip: {trigger: "item", confine: true, backgroundColor: "#fff", borderColor: grid,
       textStyle: {color: ink2, fontSize: 12}, formatter: p => {
@@ -248,7 +292,9 @@ function rankedBar(id, metric, fmt, opts = {}) {
         itemStyle: {color: isSubject(p.tk) ? s1 : peerGrey, opacity: isSubject(p.tk) ? 0.95 : 0.7,
           borderColor: "#fff", borderWidth: 1},
         label: {show: true, position: "top", formatter: CO[p.tk].label,
-          color: isSubject(p.tk) ? s1 : ink2, fontSize: isSubject(p.tk) ? 12 : 11,
+          /* Text ink, never the mark value: the Rain points must clear
+             4.5:1 as TEXT for 2.3.6 to permit the hue at all. */
+          color: isSubject(p.tk) ? inkS1 : ink2, fontSize: 12,
           fontWeight: isSubject(p.tk) ? 700 : 400}})),
       symbolSize: d => 12 + 34 * Math.sqrt(d[2] / maxRev)}],
   });
@@ -256,23 +302,61 @@ function rankedBar(id, metric, fmt, opts = {}) {
 
   /* trend small-multiples: FORM highlighted, peers grey, lines break on gaps */
   function trend(id, metric, field) {
-    const c = echarts.init(document.getElementById(id), null, {renderer: "canvas"});
+    const c = echarts.init(document.getElementById(id), "cascadia", {renderer: "canvas"});
     const series = TICKERS.map(tk => {
       const arr = field === "yoy_pct" ? CO[tk].metrics.revenue.yoy_pct : CO[tk].metrics[metric].values;
       const hero = isSubject(tk);
       if (arr.every(v => v == null)) return null;
+      /* DIRECT LABELS ARE THE CONDITION, NOT DECORATION. Six of these seven
+         lines are Rain at 2.45:1, under the 3:1 a mark owes, and Rule 2.3.6
+         permits that ONLY where every series it colours carries a direct text
+         label at 4.5:1. Before this, the peer lines carried no label and no
+         legend at all — at 320px they were five indistinguishable grey lines,
+         identifiable only by hovering, which is not a channel a keyboard or a
+         printout has. If a future change cannot fit these labels, the answer
+         is to change the chart's shape, not to drop them: without them the
+         page fails 2.3.6 and 5.3 at once, and silently.
+
+         Tickers rather than full names because they have to fit at 320px, and
+         the governance table maps every ticker to its company.
+
+         The 0.7 opacity is gone. Rain is already the de-emphasis mechanism;
+         fading it as well pushed the peer lines below even Rain's contrast. */
       return {name: CO[tk].label, type: "line", data: arr, connectNulls: false, showSymbol: false,
-        z: hero ? 5 : 1, lineStyle: {width: hero ? 2.6 : 1, color: hero ? s1 : peerGrey,
-          opacity: hero ? 1 : 0.7}, emphasis: {focus: "series"}};
+        z: hero ? 5 : 1, lineStyle: {width: hero ? 2.6 : 1.2, color: hero ? s1 : peerGrey},
+        emphasis: {focus: "series"},
+        endLabel: {show: true, distance: 6, fontSize: 12,
+          fontWeight: hero ? 700 : 400, color: hero ? inkS1 : ink2,
+          /* Series that stop early (Camtek, KLA) end mid-plot, so their label
+             lands on top of other lines. A paper outline keeps it readable —
+             the same technique the theme's annotation helper uses. It does
+             occlude a sliver of whatever it covers, which is the accepted
+             trade against an unreadable label. */
+          textBorderColor: css("--surface"), textBorderWidth: 3,
+          formatter: function () { return tk; }},
+        /* Nudge labels apart rather than hiding any of them. hideOverlap
+           stays false on purpose — a hidden label is a dropped condition. */
+        labelLayout: {moveOverlap: "shiftY", hideOverlap: false}};
     }).filter(Boolean);
     c.setOption({
-      grid: {left: 8, right: 14, top: 10, bottom: 4, containLabel: true},
+      aria: {enabled: false},
+      /* right reserves room for the direct end-labels added below. */
+      grid: {left: 8, right: 64, top: 10, bottom: 4, containLabel: true},
       xAxis: {type: "category", data: P, axisTick: {show: false}, axisLine: {lineStyle: {color: baseline}},
-        axisLabel: {color: muted, fontSize: 10, interval: (i, v) => v.endsWith("Q1"), formatter: v => v.slice(0, 4)}},
-      yAxis: {type: "value", axisLabel: {color: muted, fontSize: 10, formatter: v => v + "%"},
+        /* Every fiscal-year start at full width; every OTHER year once the
+           plot is narrow. Raising these labels from 10px to the 12px floor
+           made eight years collide into an unreadable smear at 320 — the
+           honest fix is to show fewer of them, not to shrink them back below
+           the floor. Read live rather than captured, so it re-evaluates when
+           the ResizeObserver redraws. */
+        axisLabel: {color: muted, fontSize: 12,
+          interval: (i, v) => v.endsWith("Q1") &&
+            (document.getElementById(id).clientWidth >= 420 || +v.slice(0, 4) % 2 === 0),
+          formatter: v => v.slice(0, 4)}},
+      yAxis: {type: "value", axisLabel: {color: muted, fontSize: 12, formatter: v => v + "%"},
         splitLine: {lineStyle: {color: grid}}},
       tooltip: {trigger: "axis", confine: true, backgroundColor: "#fff", borderColor: grid,
-        textStyle: {color: ink2, fontSize: 11}, formatter: ps => {
+        textStyle: {color: ink2, fontSize: 12}, formatter: ps => {
           const i = ps[0].dataIndex;
           const rows = ps.filter(p => p.value != null).sort((a, b) => b.value - a.value)
             .map(p => `${p.marker} ${p.seriesName} ${fmtPct(p.value)}`).join("<br>");
@@ -284,6 +368,118 @@ function rankedBar(id, metric, fmt, opts = {}) {
   }
   charts.push(trend("trend-gm", "gross_margin_pct", "values"));
   charts.push(trend("trend-growth", "revenue", "yoy_pct"));
+
+  /* ---- Rule 5.1 layer 2 — the values the seven charts plot ---------------- */
+  (function tables() {
+    const cell = "padding:4px 10px;border-bottom:1px solid var(--grid);text-align:right;";
+    const head = "padding:6px 10px;border-bottom:2px solid var(--baseline);text-align:right;color:var(--ink-2);";
+    const th = t => `<th style="${head}">${t}</th>`;
+    const td = t => `<td style="${cell}">${t}</td>`;
+
+    const snapCols = [
+      ["Revenue", tk => fmtRev(val(tk, "revenue"))],
+      ["Gross margin", tk => fmtPct(val(tk, "gross_margin_pct"))],
+      ["Operating margin", tk => fmtPct(val(tk, "operating_margin_pct"))],
+      ["R&D intensity", tk => fmtPct(val(tk, "rnd_ratio_pct"))],
+      ["YoY revenue growth", tk => fmtPct(growthAt(tk))],
+    ];
+    document.getElementById("peer-snapshot-table").innerHTML =
+      `<thead><tr><th style="${head}text-align:left;">Company</th>` +
+      snapCols.map(c => th(c[0])).join("") + "</tr></thead><tbody>" +
+      TICKERS.map(tk =>
+        `<tr><td style="${cell}text-align:left;">${nameOf(tk)}</td>` +
+        snapCols.map(c => td(c[1](tk))).join("") + "</tr>").join("") + "</tbody>";
+
+    document.getElementById("peer-trend-table").innerHTML =
+      `<thead><tr><th style="${head}text-align:left;">Quarter</th>` +
+      TICKERS.map(tk => th(tk + " GM %")).join("") +
+      TICKERS.map(tk => th(tk + " YoY %")).join("") + "</tr></thead><tbody>" +
+      P.map((per, i) =>
+        `<tr><td style="${cell}text-align:left;">${fq(per)}</td>` +
+        TICKERS.map(tk => td(fmtPct(CO[tk].metrics.gross_margin_pct.values[i]))).join("") +
+        TICKERS.map(tk => td(fmtPct(CO[tk].metrics.revenue.yoy_pct[i]))).join("") +
+        "</tr>").join("") + "</tbody>";
+  })();
+
+  /* ---- Rules 4.2 and 5.1 — provenance and the access layers -------------- */
+  if (typeof CASCADIA !== "undefined") {
+    const SRC = "SEC EDGAR — FormFactor and six peer companyfacts XBRL bundles";
+    const FLAGS = "GAAP as tagged; snapshot " + fq(SNAP) + "; KLA shown as reference, not ranked";
+    const wireRank = (id, chart, metric, what, unit) => {
+      const rows = TICKERS.filter(tk => val(tk, metric) != null)
+        .map(tk => ({tk, v: val(tk, metric)}))
+        .sort((a, b) => b.v - a.v);
+      const fmt = unit === "rev" ? fmtRev : fmtPct;
+      CASCADIA.accessible(id, {
+        tableId: "peer-snapshot-table",
+        label: `Horizontal bar chart, sorted high to low. ${what} at ${fq(SNAP)}, ` +
+          `${rows.length} companies. ` +
+          rows.map((r, i) => `${i + 1}. ${nameOf(r.tk)} ${fmt(r.v)}`).join("; ") + "."
+      });
+      CASCADIA.navigator(id, {
+        chart, label: `${what}, ${rows.length} companies, ranked.`,
+        series: [{name: what, points: rows.map((r, i) => ({
+          label: nameOf(r.tk), value: fmt(r.v), seriesIndex: 0, dataIndex: i}))}]
+      });
+      CASCADIA.provenance(id, {source: SRC, asOf: DATA.as_of_date, flags: FLAGS});
+    };
+    wireRank("rank-revenue", charts[0], "revenue", "Revenue", "rev");
+    wireRank("rank-gm", charts[1], "gross_margin_pct", "GAAP gross margin", "pct");
+    wireRank("rank-opm", charts[2], "operating_margin_pct", "GAAP operating margin", "pct");
+    wireRank("rank-rnd", charts[3], "rnd_ratio_pct", "R&D as a percentage of revenue", "pct");
+
+    CASCADIA.accessible("scatter", {
+      tableId: "peer-snapshot-table",
+      label: "Bubble scatter chart. Operating margin as a percentage of revenue on the " +
+        "vertical axis against year-on-year revenue growth on the horizontal axis, at " +
+        fq(SNAP) + "; bubble area is revenue. " + pts.length + " companies. " +
+        pts.map(q => `${nameOf(q.tk)}, growth ${fmtPct(q.x)}, operating margin ` +
+          `${fmtPct(q.y)}, revenue ${fmtRev(q.rev)}`).join("; ") + "."
+    });
+    CASCADIA.navigator("scatter", {
+      chart: sc, label: "Operating margin against revenue growth, " + pts.length + " companies.",
+      series: [{name: "Peers", points: pts.map((q, i) => ({
+        label: nameOf(q.tk),
+        value: `growth ${fmtPct(q.x)}, operating margin ${fmtPct(q.y)}`,
+        seriesIndex: 0, dataIndex: i}))}]
+    });
+    CASCADIA.provenance("scatter", {source: SRC, asOf: DATA.as_of_date, flags: FLAGS});
+
+    /* Trends: extrema and endpoints per company, not every quarter of seven
+       series read aloud. The trend table carries the full grid. */
+    const wireTrend = (id, chart, metricPath, what) => {
+      const series = TICKERS.map(tk => {
+        const arr = metricPath === "yoy" ? CO[tk].metrics.revenue.yoy_pct
+                                         : CO[tk].metrics.gross_margin_pct.values;
+        return arr.every(v => v == null) ? null : {name: nameOf(tk), tk, data: arr};
+      }).filter(Boolean);
+      const shape = d => {
+        const q = d.map((v, i) => [v, i]).filter(([v]) => v != null);
+        if (!q.length) return " no values";
+        const lo = q.reduce((a, b) => (b[0] < a[0] ? b : a));
+        const hi = q.reduce((a, b) => (b[0] > a[0] ? b : a));
+        const l = q[q.length - 1];
+        return ` ${fmtPct(lo[0])} in ${P[lo[1]]} to ${fmtPct(hi[0])} in ${P[hi[1]]},` +
+               ` ending ${fmtPct(l[0])} in ${P[l[1]]}`;
+      };
+      CASCADIA.accessible(id, {
+        tableId: "peer-trend-table",
+        label: `Line chart. ${what} by fiscal quarter, ${P[0]} to ${P[P.length - 1]}, ` +
+          `${series.length} companies. FormFactor is emphasised; the rest are context. ` +
+          series.map(s => `${s.name}:` + shape(s.data)).join("; ") + "."
+      });
+      CASCADIA.navigator(id, {
+        chart, label: `${what}, ${series.length} companies.`,
+        series: series.map((s, si) => ({
+          name: s.name,
+          points: s.data.map((v, di) => ({
+            label: P[di], value: fmtPct(v), seriesIndex: si, dataIndex: di}))}))
+      });
+      CASCADIA.provenance(id, {source: SRC, asOf: DATA.as_of_date, flags: FLAGS});
+    };
+    wireTrend("trend-gm", charts[5], "gm", "GAAP gross margin as a percentage of revenue");
+    wireTrend("trend-growth", charts[6], "yoy", "Year-on-year revenue growth");
+  }
 
   const ro = new ResizeObserver(() => charts.forEach(c => c && c.resize()));
   document.querySelectorAll(".chart").forEach(el => ro.observe(el));
