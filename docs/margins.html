@@ -319,7 +319,20 @@ document.getElementById("seg-kpi-grid").innerHTML = [
   /* Rule 2.3.7 — the mark takes the palette value, text takes the ink. */
   const i1 = css("--ink-s1"), i2 = css("--ink-s2"), i3 = css("--ink-s3");
   const charts = [];
-  const mk = (id, opt) => { const c = echarts.init(document.getElementById(id), "cascadia", {renderer: "canvas"}); c.setOption(opt); charts.push(c); return c; };
+  /* Fiscal-year starts at full width, every OTHER year below 420px. At
+     320px eight year labels collided into one run of digits. Read live off
+     the container so it re-evaluates on every ResizeObserver redraw. */
+  const yearTicks = id => (i, v) =>
+    v.endsWith("Q1") &&
+    (document.getElementById(id).clientWidth >= 420 || +v.slice(0, 4) % 2 === 0);
+  const mk = (id, opt) => {
+    const c = echarts.init(document.getElementById(id), "cascadia", {renderer: "canvas"});
+    if (opt.xAxis && opt.xAxis.data === P) {
+      opt = {...opt, xAxis: {...opt.xAxis,
+        axisLabel: {...opt.xAxis.axisLabel, interval: yearTicks(id)}}};
+    }
+    c.setOption(opt); charts.push(c); return c;
+  };
 
   /* shared axis/tooltip base (same look as the Phase A page) */
   const base = {
@@ -339,6 +352,10 @@ document.getElementById("seg-kpi-grid").innerHTML = [
   /* 1) GAAP gross margin trend, with the Q1 FY2026 inflection marked. */
   const gmInflect = P.indexOf(C.latest_period);
   mk("chart-gm", {...base,
+    /* Right padding for the endpoint pin. The base grid leaves 14px, and the
+       42px pin hanging off the last point ran past the card edge — "FY26"
+       rendered as "FY2ø" at both widths. */
+    grid: {...base.grid, right: 34},
     yAxis: {...base.yAxis, min: v => Math.floor(v.min - 2), max: v => Math.ceil(v.max + 2),
       axisLabel: {...base.yAxis.axisLabel, formatter: v => v + "%"}},
     tooltip: {...base.tooltip, formatter: ps => {
@@ -350,10 +367,20 @@ document.getElementById("seg-kpi-grid").innerHTML = [
     }},
     series: [{type: "line", data: CM.gross_margin_pct.values, showSymbol: false,
       lineStyle: {width: 2, color: s1}, itemStyle: {color: s1},
-      markPoint: {symbol: "pin", symbolSize: 42, silent: true,
-        itemStyle: {color: surface, borderColor: s1, borderWidth: 1},
-        label: {color: ink2, fontSize: 12, fontWeight: 600, formatter: "Q1\nFY26"},
-        data: [{coord: [gmInflect, CM.gross_margin_pct.values[gmInflect]], symbolOffset: [0, -4]}]}}],
+      /* No pin shape. A 42px teardrop could not hold a two-line label at the
+         12px floor, so the pin's own outline struck through "FY26" and it read
+         as "FY2ø" — three panel seats reported it and one could not read the
+         endpoint at all. A paper-outlined text label carries the same
+         information with nothing to collide with, and drops a decorative
+         marker that Rule 2.5 would not have defended anyway. */
+      markPoint: {symbol: "circle", symbolSize: 0, silent: true,
+        label: {color: ink2, fontSize: 12, fontWeight: 600, formatter: "Q1\nFY26",
+                textBorderColor: surface, textBorderWidth: 3, lineHeight: 15},
+        /* Lifted clear of the line and pulled in from the edge. The pin sat on
+           the final descending segment, which struck through "FY26" and read as
+           "FY2ø"; at 320px the card edge clipped it outright. Three seats
+           reported it, and one could not read the endpoint at all. */
+        data: [{coord: [gmInflect, CM.gross_margin_pct.values[gmInflect]], symbolOffset: [-14, -52]}]}}],
   });
 
   /* 2) Gross-profit change decomposed (revenue effect + margin effect = ΔGP).
@@ -363,7 +390,11 @@ document.getElementById("seg-kpi-grid").innerHTML = [
   const netGP  = P.map((_, i) => { const b = bridge(i); return b ? +b.net.toFixed(2) : null; });
   mk("chart-bridge", {...base,
     grid: {...base.grid, top: 30},
-    legend: {top: 0, right: 0, itemWidth: 12, itemHeight: 8, textStyle: {color: ink2, fontSize: 12},
+    /* show:true is NOT optional — the theme sets legend:{show:false}, so a
+       legend declared without it renders nothing. This chart shipped with
+       two bar colours and a line and no key at all. */
+    legend: {show: true, top: 0, right: 0, itemWidth: 12, itemHeight: 8,
+      textStyle: {color: ink2, fontSize: 12},
       data: ["Revenue effect", "Margin effect", "Δ Gross profit"]},
     yAxis: {...base.yAxis, axisLabel: {...base.yAxis.axisLabel, formatter: v => "$" + v + "M"}},
     tooltip: {...base.tooltip, formatter: ps => {
@@ -383,7 +414,7 @@ document.getElementById("seg-kpi-grid").innerHTML = [
   const sysRev   = seg("systems", "seg_revenue", "values");
   mk("chart-segmix", {...base,
     grid: {...base.grid, top: 30},
-    legend: {top: 0, right: 0, icon: "roundRect", itemWidth: 12, itemHeight: 8,
+    legend: {show: true, top: 0, right: 0, icon: "roundRect", itemWidth: 12, itemHeight: 8,
       textStyle: {color: ink2, fontSize: 12}, data: ["Probe Cards", "Systems"]},
     yAxis: {...base.yAxis, axisLabel: {...base.yAxis.axisLabel, formatter: v => "$" + v + "M"}},
     tooltip: {...base.tooltip, formatter: ps => {
@@ -400,21 +431,43 @@ document.getElementById("seg-kpi-grid").innerHTML = [
   /* 4) Segment gross margin — two lines, only over the reconcilable window. */
   const probeGM = seg("probe_cards", "seg_gross_margin_pct", "values");
   const sysGM   = seg("systems", "seg_gross_margin_pct", "values");
+  /* The axis is cut to the quarters that actually carry data, and the value
+     axis to the range they occupy. It ran the full eight-year period over eight
+     quarters of segment margin on a 0% baseline, so roughly four-fifths of the
+     plot was empty and the lines were squeezed into a corner. All four panel
+     seats read it as broken — one opened with "my first read was 'the chart
+     failed to load'". The subtitle already says FY2024+; the axis now agrees
+     with it. Derived from the data, never a typed literal (check K4/K1). */
+  const segFirst = probeGM.findIndex((v, i) => v != null || sysGM[i] != null);
+  const segP     = P.slice(segFirst);
+  const segProbe = probeGM.slice(segFirst);
+  const segSys   = sysGM.slice(segFirst);
+  const segVals  = segProbe.concat(segSys).filter(v => v != null);
+
   mk("chart-seggm", {...base,
     grid: {...base.grid, top: 30},
-    legend: {top: 0, right: 0, icon: "roundRect", itemWidth: 12, itemHeight: 8,
+    legend: {show: true, top: 0, right: 0, icon: "roundRect", itemWidth: 12, itemHeight: 8,
       textStyle: {color: ink2, fontSize: 12}, data: ["Probe Cards", "Systems"]},
-    yAxis: {...base.yAxis, axisLabel: {...base.yAxis.axisLabel, formatter: v => v + "%"}},
+    /* Short quarter labels and renderer-thinned density. "2024 Q1" at every one
+       of nine quarters overprinted at 320px; "24Q1" with ECharts choosing the
+       interval fits at both widths and stays derived rather than typed. */
+    xAxis: {...base.xAxis, data: segP,
+      axisLabel: {...base.xAxis.axisLabel, interval: "auto", hideOverlap: true,
+        formatter: v => v.slice(2)}},
+    yAxis: {...base.yAxis,
+      min: Math.floor((Math.min(...segVals) - 3) / 5) * 5,
+      max: Math.ceil((Math.max(...segVals) + 3) / 5) * 5,
+      axisLabel: {...base.yAxis.axisLabel, formatter: v => v + "%"}},
     tooltip: {...base.tooltip, formatter: ps => {
       const i = ps[0].dataIndex;
-      if (probeGM[i] == null && sysGM[i] == null)
-        return `<b>${fq(P[i])}</b><br><span style="color:${muted}">segment GM not reconcilable (pre-FY2024)</span>`;
-      return `<b>${fq(P[i])}</b><br>Probe Cards ${fmtPct(probeGM[i])}<br>Systems ${fmtPct(sysGM[i])}`;
+      if (segProbe[i] == null && segSys[i] == null)
+        return `<b>${fq(segP[i])}</b><br><span style="color:${muted}">segment GM not reconcilable (pre-FY2024)</span>`;
+      return `<b>${fq(segP[i])}</b><br>Probe Cards ${fmtPct(segProbe[i])}<br>Systems ${fmtPct(segSys[i])}`;
     }},
     series: [
-      {name: "Probe Cards", type: "line", data: probeGM, connectNulls: false, showSymbol: true, symbolSize: 5,
+      {name: "Probe Cards", type: "line", data: segProbe, connectNulls: false, showSymbol: true, symbolSize: 5,
         lineStyle: {width: 2, color: s1}, itemStyle: {color: s1}},
-      {name: "Systems", type: "line", data: sysGM, connectNulls: false, showSymbol: true, symbolSize: 5,
+      {name: "Systems", type: "line", data: segSys, connectNulls: false, showSymbol: true, symbolSize: 5,
         lineStyle: {width: 2, color: s2}, itemStyle: {color: s2}},
     ],
   });
@@ -438,8 +491,21 @@ document.getElementById("seg-kpi-grid").innerHTML = [
        ECharts overwrites the authored label on every render. */
     aria: {enabled: false},
     grid: {left: 8, right: 16, top: 20, bottom: 4, containLabel: true},
+    /* interval:0 forces every category label. ECharts was dropping two of
+       four at 320px, leaving the Systems bar and the consolidated total
+       unnamed — and the total is Rain, so the dropped label was 2.3.6's
+       compensating condition, not decoration. width+break wraps them
+       instead of letting them collide. */
     xAxis: {type: "category", data: cats, axisTick: {show: false}, axisLine: {lineStyle: {color: baseline}},
-      axisLabel: {color: ink2, fontSize: 12, lineHeight: 15}},
+      axisLabel: {color: ink2, fontSize: 12, lineHeight: 15, interval: 0,
+        /* Every label, always — ECharts was dropping two of the four at 320px,
+           leaving the Systems bar and the consolidated total unnamed, and the
+           total is Rain, so the dropped label was 2.3.6's compensating
+           condition rather than decoration. The wrap width is measured from
+           the container rather than typed, so the labels wrap instead of
+           overprinting at any width (check K4). */
+        width: Math.max(46, Math.floor((document.getElementById("chart-gpbridge").clientWidth || 680) / cats.length) - 10),
+        overflow: "break", hideOverlap: false}},
     yAxis: {type: "value", axisLabel: {color: muted, fontSize: 12, formatter: v => "$" + v + "M"},
       splitLine: {lineStyle: {color: grid}}},
     tooltip: {trigger: "item", confine: true, backgroundColor: "#fff", borderColor: grid,
@@ -483,26 +549,31 @@ document.getElementById("seg-kpi-grid").innerHTML = [
       : u === "pct" ? v.toFixed(1) + " percent" : "$" + v.toFixed(1) + " million";
     /* Extrema and endpoints — 33 quarters read aloud is unusable, and both
        tables on this page carry the full series. */
-    const shape = (vals, u) => {
+    const shape = (vals, u, pers) => {
+      pers = pers || P;
       const pts = vals.map((v, i) => [v, i]).filter(([v]) => v != null);
       if (!pts.length) return " No values.";
       const lo = pts.reduce((a, b) => (b[0] < a[0] ? b : a));
       const hi = pts.reduce((a, b) => (b[0] > a[0] ? b : a));
       const f = pts[0], l = pts[pts.length - 1];
-      return ` Ranges from ${say(lo[0], u)} in ${P[lo[1]]} to ${say(hi[0], u)} in ${P[hi[1]]}.` +
-             ` Starts ${P[f[1]]} ${say(f[0], u)}, ends ${P[l[1]]} ${say(l[0], u)}.`;
+      return ` Ranges from ${say(lo[0], u)} in ${pers[lo[1]]} to ${say(hi[0], u)} in ${pers[hi[1]]}.` +
+             ` Starts ${pers[f[1]]} ${say(f[0], u)}, ends ${pers[l[1]]} ${say(l[0], u)}.`;
     };
-    const wire = (id, chart, tableId, form, what, unit, series, cats) => {
-      const overCats = cats || P;
+    /* `pers` lets a chart describe its own period window. chart-seggm plots
+       only the quarters that carry segment data, so describing it over the
+       full 33 would tell a screen reader something the chart does not draw. */
+    const wire = (id, chart, tableId, form, what, unit, series, cats, pers) => {
+      const overCats = cats || pers || P;
+      const per = pers || P;
       CASCADIA.accessible(id, {
         tableId: tableId,
         label: `${form}. ${what}, ${cats ? cats.length + " categories" :
-          "by fiscal quarter, " + P[0] + " to " + P[P.length - 1] + ", " + P.length + " quarters"}.` +
+          "by fiscal quarter, " + per[0] + " to " + per[per.length - 1] + ", " + per.length + " quarters"}.` +
           (cats
             ? " " + series[0].data.map((v, i) =>
                 `${overCats[i].replace("\n", " ")} ${say(v, unit)}`).join("; ") + "."
-            : (series.length === 1 ? shape(series[0].data, unit)
-               : series.map(s => ` ${s.name}:` + shape(s.data, unit)).join("")))
+            : (series.length === 1 ? shape(series[0].data, unit, per)
+               : series.map(s => ` ${s.name}:` + shape(s.data, unit, per)).join("")))
       });
       CASCADIA.navigator(id, {
         chart,
@@ -534,7 +605,8 @@ document.getElementById("seg-kpi-grid").innerHTML = [
          [{name: "Probe Cards", data: probeRev}, {name: "Systems", data: sysRev}]);
     wire("chart-seggm", charts[3], "seg-table", "Line chart",
          "Segment gross margin as a percentage of segment revenue", "pct",
-         [{name: "Probe Cards", data: probeGM}, {name: "Systems", data: sysGM}]);
+         [{name: "Probe Cards", data: segProbe}, {name: "Systems", data: segSys}],
+         null, segP);
     wire("chart-gpbridge", charts[4], "seg-table", "Waterfall chart",
          "Segment gross profit reconciled to consolidated GAAP gross profit, in millions of dollars",
          "usd", [{name: "Gross-profit bridge", data: [pGP, sGP, cGP, consGP], seriesIndex: 1}], cats);
