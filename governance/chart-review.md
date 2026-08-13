@@ -125,7 +125,7 @@ drives fix order — a three-seat gap outranks a one-seat defect.
 | 18 | *"Why are there two of these? … my first reaction was that someone duplicated a slide"* | 3 | yes | **fix** — the identical title on `q2-readthrough__c1` and `q2-filed__walk` was deliberate and it backfired: three seats read duplication rather than reconciliation. That announced equals filed to the dollar is the finding, and no chart says it | 3.1 |
 | 19 | *"'Held' is the wrong verb… the green line ranges 28% to 40% and has fallen about five points since early 2025"* | 1 | yes | **fix** — `index__chart-opex` title | 3.2 |
 | 20 | *"13.6 plus 14.3 is 27.9, not 31.0 — so there's 3.1 points of something else and the chart doesn't name it"* | 2 | yes | **fix** — the opex title implies a decomposition that does not close | 3.2, 4.1 |
-| 21 | *"'Systems fell 34.0%' — not visible… comparing floating segment lengths across bars is the specific thing stacked bars cannot do"* | 1 | yes | **accept** — the stack is right for the 88% share claim, which is the dominant one. Recorded rather than redrawn; the title will drop the growth clause it cannot support | 3.2 |
+| 21 | *"'Systems fell 34.0%' — not visible… comparing floating segment lengths across bars is the specific thing stacked bars cannot do"* | 1 | yes | **accepted** — the stack is right for the 88% share claim, which is the dominant one. The title's "Systems fell 34.0%" clause stays for now: changing a title needs authorisation under Phase 4 and this one was not in the approved set. Carried as an open item | 3.2 |
 | 22 | *"no way of knowing which bars are derived… one point in four is a residual"* | 2 | yes | **accept** — the ‡ convention is disclosed in the provenance strip and in Data & method and predates this reskin. Marking individual bars is a data-layer change outside this authorization | 4.1 |
 | 23 | *"Why am I looking at this twice? It's the identical line to the index page chart"* | 3 | no | **rejected** — `index` carries the headline series and `margins` opens the walk with it. Repetition across a linked pack is navigation, not a chart defect | — |
 | 24 | *"What happened in that 2022 quarter that took margin to 27%?"* | 3 | no | **rejected** — a good reader question, but no title on the page makes a claim about 2022, so 3.4 does not bite. Logged as content backlog | — |
@@ -142,7 +142,7 @@ drives fix order — a three-seat gap outranks a one-seat defect.
 
 ```
 PANEL: 4 seats, simulated · 19 charts · findings 34 · defects 22 · novel 20
-       fixed 0 · accepted 2 · rejected 12   (fix round pending)
+       fixed 20 · accepted 2 · rejected 12
        D = 1.16 defects/chart · N = 0.91 novel share · R = 0.35 rejected share
 ```
 
@@ -184,4 +184,68 @@ this rule precisely because the first panel run under 7.4 read design-width
 renders only and missed exactly this class. Findings 3, 12, 14, 19 and 20 are
 3.2 failures where a title asserts something its own chart does not carry.
 
-Fix round to follow. Nothing published, nothing pushed.
+---
+
+## Part 3 — Fix round
+
+All 20 fixable defects were repaired across five commits, one page each, with
+both gates run either side of every one.
+
+**The regression that started it.** Four charts declared a legend without
+`show: true`, so the theme's `legend: {show: false}` default hid all four when
+Phase 3 adopted it. Restored on `index__chart-opex`,
+`margins__chart-bridge`, `margins__chart-segmix` and `margins__chart-seggm`.
+
+**Everything that broke only at 320 px**, which is the width v2.5 added to this
+rule: year labels thinned to every other year on all eight year-axis charts;
+the peers rank charts thin their ticks with `hideOverlap`; the GP bridge forces
+all four category labels; the readthrough bridge wraps its categories and
+staggers its value labels; the scatter's bubbles scale with the canvas and its
+axis names stand down; the trend end-labels get a measured right gutter. Four
+of those were Rain series losing the direct label that makes the hue legal at
+all — 2.3.6's compensating condition, not cosmetics.
+
+**Three that were wrong at every width.** The `margins__chart-gm` endpoint
+marker is a text label now, not a 42 px pin whose own outline struck through
+"FY26". `margins__chart-seggm` is cut to the quarters that carry data, on a
+value axis derived from their range, instead of eight empty years on a 0%
+baseline. KLA no longer sets the revenue ranking's scale — it is declared
+"reference, not ranked" on that page, so letting it own the axis was the
+inconsistency, and one seat reported inTEST as having no visible bar at all.
+
+**Five titles revised and re-approved**, all of them claims the chart did not
+carry: the EPS title named "the two spikes" while the markers sat on one spike
+and one trough; `peers__rank-gm` was off by one against its own bar count; the
+opex title said "held" of a line that had fallen five points; `trend-growth`
+dropped a superlative the axis resolution could not support; and `q2-filed`
+now states the reconciliation the panel read as a duplicated slide.
+
+**Two rendering changes were deliberate and are recorded as such.**
+`chart-seggm` draws 9 category slots instead of 33, and `rank-revenue` draws
+five bars instead of six. Verified value by value: every non-null figure in
+seggm is identical, and every surviving company in rank-revenue holds its exact
+value. Nothing else moved — no plotted value, KPI, callout, as-of date or table
+content differs anywhere across the five pages from the pre-reskin capture.
+
+### Open items carried
+
+| Item | Why it is carried |
+|---|---|
+| The `margins__chart-segmix` title claims "Systems fell 34.0%", which a floating stacked segment cannot show (finding 21) | Changing it is a title change and needs authorisation under Phase 4; it was not in the approved set. The 88% share claim the stack does support is the dominant one |
+| Derived Q4 bars are not individually marked (finding 22) | Disclosed in the provenance strip and Data & method. Marking bars is a data-layer change outside this reskin's authorization |
+| Evergreen and `--up-ink` measure 1.42:1 (pre-panel item 24) | Coherence rather than conformance — the chips carry an arrow and signed text. No seat raised it, which is weak evidence it does not bite in practice |
+| Two content questions the panel asked and the frozen dataset cannot answer: what caused the 2022 margin collapse, and whether the $21.5M restructuring repeats | Both are good. Both need data past the freeze |
+
+### Revised verdict
+
+**No INVARIANT failure outstanding.** The 3.6 legend failure is repaired on all
+four charts; the 5.3 / 5.5 / 2.3.6 failures at 320 px are repaired on all
+affected charts; the 3.2 title failures are repaired and re-approved. Two
+defects ship accepted, with reasons recorded above and no preference weight
+attached to either.
+
+**SHIP** — subject to the module's own publish gates, which are green: four
+domain checks pass and the freeze is intact at 19 protected paths.
+
+Nothing has been pushed. Publishing is Aaron's call and pushing `main` is the
+deploy.

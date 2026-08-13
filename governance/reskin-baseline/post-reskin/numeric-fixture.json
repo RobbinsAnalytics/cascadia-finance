@@ -1020,13 +1020,9 @@
               "index": 0,
               "labels": [
                 "2018",
-                "2019",
                 "2020",
-                "2021",
                 "2022",
-                "2023",
                 "2024",
-                "2025",
                 "2026"
               ],
               "type": "category"
@@ -1107,13 +1103,9 @@
               "index": 0,
               "labels": [
                 "2018",
-                "2019",
                 "2020",
-                "2021",
                 "2022",
-                "2023",
                 "2024",
-                "2025",
                 "2026"
               ],
               "type": "category"
@@ -1276,13 +1268,9 @@
               "index": 0,
               "labels": [
                 "2018",
-                "2019",
                 "2020",
-                "2021",
                 "2022",
-                "2023",
                 "2024",
-                "2025",
                 "2026"
               ],
               "type": "category"
@@ -1362,13 +1350,9 @@
               "index": 0,
               "labels": [
                 "2018",
-                "2019",
                 "2020",
-                "2021",
                 "2022",
-                "2023",
                 "2024",
-                "2025",
                 "2026"
               ],
               "type": "category"
@@ -2082,8 +2066,8 @@
                   },
                   "label": {},
                   "symbolOffset": [
-                    0,
-                    -4
+                    -14,
+                    -52
                   ]
                 }
               ],
@@ -2222,30 +2206,6 @@
           "series": [
             {
               "data": [
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
                 37.15,
                 45.11,
                 42.31,
@@ -2263,30 +2223,6 @@
             },
             {
               "data": [
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
                 45.3,
                 46.21,
                 41.51,
@@ -2308,19 +2244,19 @@
             {
               "extent": [
                 0,
-                32
+                8
               ],
               "index": 0,
               "labels": [
-                "2018",
-                "2019",
-                "2020",
-                "2021",
-                "2022",
-                "2023",
-                "2024",
-                "2025",
-                "2026"
+                "24Q1",
+                "24Q2",
+                "24Q3",
+                "24Q4",
+                "25Q1",
+                "25Q2",
+                "25Q3",
+                "25Q4",
+                "26Q1"
               ],
               "type": "category"
             }
@@ -2328,18 +2264,17 @@
           "yAxis": [
             {
               "extent": [
-                0,
-                60
+                30,
+                55
               ],
               "index": 0,
               "labels": [
-                "0%",
-                "10%",
-                "20%",
                 "30%",
+                "35%",
                 "40%",
+                "45%",
                 "50%",
-                "60%"
+                "55%"
               ],
               "type": "value"
             }
@@ -3198,13 +3133,9 @@
               "index": 0,
               "labels": [
                 "2018",
-                "2019",
                 "2020",
-                "2021",
                 "2022",
-                "2023",
                 "2024",
-                "2025",
                 "2026"
               ],
               "type": "category"
@@ -3283,8 +3214,8 @@
                   },
                   "label": {},
                   "symbolOffset": [
-                    0,
-                    -4
+                    -14,
+                    -52
                   ]
                 }
               ],
@@ -3302,13 +3233,9 @@
               "index": 0,
               "labels": [
                 "2018",
-                "2019",
                 "2020",
-                "2021",
                 "2022",
-                "2023",
                 "2024",
-                "2025",
                 "2026"
               ],
               "type": "category"
@@ -3392,7 +3319,9 @@
               "index": 0,
               "labels": [
                 "Probe Cards",
-                "Corporate /\nunallocated"
+                "Systems",
+                "Corporate /\nunallocated",
+                "Consolidated\nGAAP GP"
               ],
               "type": "category"
             }
@@ -3421,30 +3350,6 @@
           "series": [
             {
               "data": [
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
                 37.15,
                 45.11,
                 42.31,
@@ -3462,30 +3367,6 @@
             },
             {
               "data": [
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
                 45.3,
                 46.21,
                 41.51,
@@ -3507,19 +3388,15 @@
             {
               "extent": [
                 0,
-                32
+                8
               ],
               "index": 0,
               "labels": [
-                "2018",
-                "2019",
-                "2020",
-                "2021",
-                "2022",
-                "2023",
-                "2024",
-                "2025",
-                "2026"
+                "24Q1",
+                "24Q3",
+                "25Q1",
+                "25Q3",
+                "26Q1"
               ],
               "type": "category"
             }
@@ -3527,18 +3404,17 @@
           "yAxis": [
             {
               "extent": [
-                0,
-                60
+                30,
+                55
               ],
               "index": 0,
               "labels": [
-                "0%",
-                "10%",
-                "20%",
                 "30%",
+                "35%",
                 "40%",
+                "45%",
                 "50%",
-                "60%"
+                "55%"
               ],
               "type": "value"
             }
@@ -3641,13 +3517,9 @@
               "index": 0,
               "labels": [
                 "2018",
-                "2019",
                 "2020",
-                "2021",
                 "2022",
-                "2023",
                 "2024",
-                "2025",
                 "2026"
               ],
               "type": "category"
@@ -4429,16 +4301,6 @@
               "data": [
                 {
                   "itemStyle": {
-                    "borderColor": "#5b6660",
-                    "borderRadius": 2,
-                    "borderType": "dashed",
-                    "borderWidth": 1.5,
-                    "color": "transparent"
-                  },
-                  "value": 3415.078
-                },
-                {
-                  "itemStyle": {
                     "borderRadius": 2,
                     "color": "#9aa6a0"
                   },
@@ -4484,15 +4346,16 @@
             {
               "extent": [
                 0,
-                4000
+                1500
               ],
               "index": 0,
               "labels": [
                 "$0M",
-                "$1.00B",
-                "$2.00B",
-                "$3.00B",
-                "$4.00B"
+                "$300M",
+                "$600M",
+                "$900M",
+                "$1.20B",
+                "$1.50B"
               ],
               "type": "value"
             }
@@ -4501,11 +4364,10 @@
             {
               "extent": [
                 0,
-                5
+                4
               ],
               "index": 0,
               "labels": [
-                "KLA (ref)",
                 "Teradyne",
                 "Onto Innovation",
                 "FormFactor",
@@ -6317,16 +6179,6 @@
               "data": [
                 {
                   "itemStyle": {
-                    "borderColor": "#5b6660",
-                    "borderRadius": 2,
-                    "borderType": "dashed",
-                    "borderWidth": 1.5,
-                    "color": "transparent"
-                  },
-                  "value": 3415.078
-                },
-                {
-                  "itemStyle": {
                     "borderRadius": 2,
                     "color": "#9aa6a0"
                   },
@@ -6372,15 +6224,16 @@
             {
               "extent": [
                 0,
-                4000
+                1500
               ],
               "index": 0,
               "labels": [
                 "$0M",
-                "$1.00B",
-                "$2.00B",
-                "$3.00B",
-                "$4.00B"
+                "$300M",
+                "$600M",
+                "$900M",
+                "$1.20B",
+                "$1.50B"
               ],
               "type": "value"
             }
@@ -6389,11 +6242,10 @@
             {
               "extent": [
                 0,
-                5
+                4
               ],
               "index": 0,
               "labels": [
-                "KLA (ref)",
                 "Teradyne",
                 "Onto Innovation",
                 "FormFactor",
@@ -8566,11 +8418,11 @@
             }
           ],
           "svgText": [
-            "36",
-            "41",
-            "46",
-            "51",
-            "56",
+            "36%",
+            "41%",
+            "46%",
+            "51%",
+            "56%",
             "Q1 FY26",
             "Q2 FY26",
             "GAAP +12.3 pts",
@@ -8600,11 +8452,11 @@
               ],
               "index": 0,
               "labels": [
-                "36",
-                "41",
-                "46",
-                "51",
-                "56"
+                "36%",
+                "41%",
+                "46%",
+                "51%",
+                "56%"
               ],
               "type": "value"
             }
@@ -8746,9 +8598,31 @@
             {
               "data": [
                 86.79,
-                12.3,
+                {
+                  "emphasis": {
+                    "label": {}
+                  },
+                  "label": {
+                    "offset": [
+                      0,
+                      -17
+                    ]
+                  },
+                  "value": 12.3
+                },
                 31.83,
-                130.922
+                {
+                  "emphasis": {
+                    "label": {}
+                  },
+                  "label": {
+                    "offset": [
+                      0,
+                      -17
+                    ]
+                  },
+                  "value": 130.922
+                }
               ],
               "markLine": null,
               "markPoint": null,
@@ -8765,13 +8639,16 @@
             "120",
             "150",
             "Q1 FY26",
-            "gross profit",
-            "Revenue",
+            "gross",
+            "profit",
+            "Revenu",
+            "e",
             "effect",
             "Margin",
             "effect",
             "Q2 FY26",
-            "gross profit",
+            "gross",
+            "profit",
             "$86.8M",
             "+$12.3M",
             "+$31.8M",
@@ -8849,13 +8726,12 @@
             }
           ],
           "svgText": [
-            "36",
-            "41",
-            "46",
-            "51",
-            "56",
+            "36%",
+            "41%",
+            "46%",
+            "51%",
+            "56%",
             "Q1 FY26",
-            "Q2 FY26",
             "GAAP +12.3 pts",
             "ex-restr. +4.5 pts",
             "non-GAAP +4.3 pts"
@@ -8869,8 +8745,7 @@
               ],
               "index": 0,
               "labels": [
-                "Q1 FY26",
-                "Q2 FY26"
+                "Q1 FY26"
               ],
               "type": "category"
             }
@@ -8883,11 +8758,11 @@
               ],
               "index": 0,
               "labels": [
-                "36",
-                "41",
-                "46",
-                "51",
-                "56"
+                "36%",
+                "41%",
+                "46%",
+                "51%",
+                "56%"
               ],
               "type": "value"
             }
