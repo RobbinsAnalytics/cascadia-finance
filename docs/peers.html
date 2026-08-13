@@ -53,10 +53,10 @@
       <!-- Rule 3.1 finding titles; the metric moves to the subtitle. K2 for all
            four ranked bars: every value and the ordering are printed as bar
            labels on the chart the title sits on. -->
-      <div class="chart-card"><h3>At $226M, FormFactor is mid-pack — above Cohu and inTEST, below Onto Innovation and Teradyne</h3><p class="chart-sub">$M, snapshot quarter</p><div class="chart" id="rank-revenue"></div></div>
-      <div class="chart-card"><h3>FormFactor has the lowest gross margin of the four peers that tag it — 38.4% against Teradyne&rsquo;s 60.9%</h3><p class="chart-sub">% of revenue, GAAP</p><div class="chart" id="rank-gm"></div></div>
-      <div class="chart-card"><h3>FormFactor&rsquo;s 7.4% operating margin ranks third of five, well behind Teradyne&rsquo;s 36.9%</h3><p class="chart-sub">% of revenue, GAAP</p><div class="chart" id="rank-opm"></div></div>
-      <div class="chart-card"><h3>FormFactor reinvests 13.6% of revenue in R&amp;D — second only to Cohu&rsquo;s 21.1%</h3><p class="chart-sub">R&amp;D as % of revenue</p><div class="chart" id="rank-rnd"></div></div>
+      <div class="chart-card"><h3>At $226M, FormFactor is mid-pack — above Cohu and inTEST, below Onto Innovation and Teradyne</h3><p class="chart-sub">$M, snapshot quarter &middot; five ranked companies; KLA is a reference and is excluded here so it does not set the scale</p><div class="chart" id="rank-revenue"></div></div>
+      <div class="chart-card"><h3>FormFactor has the lowest gross margin of the four companies that tag it — 38.4% against Teradyne&rsquo;s 60.9%</h3><p class="chart-sub">% of revenue, GAAP &middot; four companies tag it; Cohu and KLA do not</p><div class="chart" id="rank-gm"></div></div>
+      <div class="chart-card"><h3>FormFactor&rsquo;s 7.4% operating margin ranks third of five, well behind Teradyne&rsquo;s 36.9%</h3><p class="chart-sub">% of revenue, GAAP &middot; five companies tag it; KLA does not</p><div class="chart" id="rank-opm"></div></div>
+      <div class="chart-card"><h3>FormFactor reinvests 13.6% of revenue in R&amp;D — second only to Cohu&rsquo;s 21.1%</h3><p class="chart-sub">R&amp;D as % of revenue &middot; all six companies tag it</p><div class="chart" id="rank-rnd"></div></div>
     </div>
   </section>
 
@@ -70,7 +70,7 @@
            company are printed in the snapshot table; 7.4% and 36.9% are also
            rank-opm bar labels. -->
       <h3>FormFactor pairs 32.0% growth with a 7.4% operating margin; Teradyne pairs 87.0% with 36.9%</h3>
-      <p class="chart-sub">Operating margin vs YoY revenue growth · bubble area &asymp; revenue</p>
+      <p class="chart-sub">Operating margin vs YoY revenue growth · bubble area &asymp; revenue, from $34M (inTEST) to $1.28B (Teradyne)</p>
       <div class="chart" id="scatter" style="height:340px;"></div>
     </div>
   </section>
@@ -84,12 +84,12 @@
            snapshot deliberately: across the full series FormFactor is ABOVE a
            peer in four quarters (2019Q4, 2022Q1, 2022Q2, 2024Q2), so an
            "always below" claim would be false. -->
-      <div class="chart-card"><h3>FormFactor&rsquo;s gross margin ends the series at 38.4%, below every peer that tags it</h3><p class="chart-sub">%, GAAP · FormFactor emphasised, peers in context</p><div class="chart" id="trend-gm"></div></div>
+      <div class="chart-card"><h3>FormFactor&rsquo;s gross margin ends the series at 38.4%, below every peer that tags it</h3><p class="chart-sub">%, GAAP &middot; FormFactor emphasised, peers in context &middot; Camtek appears here and not in the rankings, which need a quarterly filing</p><div class="chart" id="trend-gm"></div></div>
       <!-- K2: 32.0% and 87.0% are both snapshot-table cells; 31.97 is verified as
            the maximum of FormFactor's own series. The Teradyne clause is
            load-bearing — "fastest in the series" alone, on a chart showing
            seven companies, reads as fastest of the seven, which is false. -->
-      <div class="chart-card"><h3>FormFactor&rsquo;s 32.0% growth is its own fastest in the series — though Teradyne is growing at 87.0%</h3><p class="chart-sub">% YoY · FormFactor emphasised, peers in context</p><div class="chart" id="trend-growth"></div></div>
+      <div class="chart-card"><h3>FormFactor&rsquo;s growth has recovered to 32.0%, while Teradyne is running at 87.0%</h3><p class="chart-sub">% YoY · FormFactor emphasised, peers in context</p><div class="chart" id="trend-growth"></div></div>
     </div>
   </section>
 
@@ -236,14 +236,26 @@ function rankedBar(id, metric, fmt, opts = {}) {
   const el = document.getElementById(id);
   if (typeof echarts === "undefined") { el.innerHTML = '<p class="fallback-note">Chart library unavailable.</p>'; return null; }
   // companies with a comparable value at the snapshot, sorted for ranking
-  const data = TICKERS.filter(tk => val(tk, metric) != null)
+  /* opts.excludeRef drops the reference company from a chart whose scale it
+     would otherwise own. On revenue, KLA at $3.42B is 15x FormFactor and
+     crushed the entire ranked set into the first 8% of the width — three
+     seats said so and one reported inTEST as having no visible bar at all at
+     320px. KLA is declared "reference, not ranked" on this page, so letting
+     it set the ranked axis was the inconsistency; its revenue is still in the
+     snapshot table. */
+  const data = TICKERS.filter(tk => val(tk, metric) != null && !(opts.excludeRef && isRef(tk)))
     .map(tk => ({tk, v: val(tk, metric)}))
     .sort((a, b) => opts.asc ? a.v - b.v : b.v - a.v);
   const c = echarts.init(el, "cascadia", {renderer: "canvas"});
   c.setOption({
     aria: {enabled: false},   // ECharts overwrites the authored label; see q2-readthrough
     grid: {left: 8, right: 54, top: 6, bottom: 4, containLabel: true},
-    xAxis: {type: "value", axisLabel: {color: css("--muted"), fontSize: 12, formatter: fmt},
+    /* hideOverlap lets the renderer thin the ticks instead of overprinting
+       them. At 320px all four rank charts smeared their axis into
+       "$1.00B$2.00B$3.00B" and similar. Renderer-thinned, not a typed
+       interval — check K4 asks for exactly that. */
+    xAxis: {type: "value", axisLabel: {color: css("--muted"), fontSize: 12, formatter: fmt,
+              hideOverlap: true},
             splitLine: {lineStyle: {color: css("--grid")}}},
     yAxis: {type: "category", inverse: true, data: data.map(d => nameOf(d.tk)),
             axisTick: {show: false}, axisLine: {lineStyle: {color: css("--baseline")}},
@@ -271,7 +283,7 @@ function rankedBar(id, metric, fmt, opts = {}) {
         baseline = css("--baseline"), ink2 = css("--ink-2"), peerGrey = css("--rain"),
         inkS1 = css("--ink-s1"), ink = css("--ink");
 
-  charts.push(rankedBar("rank-revenue", "revenue", fmtRev));
+  charts.push(rankedBar("rank-revenue", "revenue", fmtRev, {excludeRef: true}));
   charts.push(rankedBar("rank-gm", "gross_margin_pct", v => v.toFixed(1) + "%"));
   charts.push(rankedBar("rank-opm", "operating_margin_pct", v => v.toFixed(1) + "%"));
   charts.push(rankedBar("rank-rnd", "rnd_ratio_pct", v => v.toFixed(1) + "%"));
@@ -280,7 +292,17 @@ function rankedBar(id, metric, fmt, opts = {}) {
   const pts = TICKERS.filter(tk => val(tk, "operating_margin_pct") != null && growthAt(tk) != null)
     .map(tk => ({tk, x: growthAt(tk), y: val(tk, "operating_margin_pct"), rev: val(tk, "revenue")}));
   const maxRev = Math.max(...pts.map(p => p.rev));
-  const sc = echarts.init(document.getElementById("scatter"), "cascadia", {renderer: "canvas"});
+  /* The scatter is the one chart where a mark can cover a label. At 320px
+     the FormFactor bubble sat on inTEST's label and clipped it to "inT",
+     and those are Rain points, so the lost label is 2.3.6's compensating
+     condition rather than an overlap to live with. moveOverlap does not
+     help: it de-collides labels against each other, not against marks.
+     Two things give the labels room instead — the bubbles scale with the
+     canvas, and the axis names stand down below 420px where the subtitle
+     already names both axes. */
+  const scEl = document.getElementById("scatter");
+  const scNarrow = () => (scEl.clientWidth || 680) < 420;
+  const sc = echarts.init(scEl, "cascadia", {renderer: "canvas"});
   sc.setOption({
     aria: {enabled: false},
     /* left/top were 8/10 with containLabel, which reserves room for axis
@@ -288,12 +310,12 @@ function rankedBar(id, metric, fmt, opts = {}) {
        the left edge, and Teradyne's label, sitting at 36.9% against a 40%
        axis top, was clipped off the top. That label is the compensating
        condition that makes Rain legal here, so losing it is not cosmetic. */
-    grid: {left: 54, right: 20, top: 28, bottom: 34},
-    xAxis: {name: "YoY revenue growth", nameLocation: "middle", nameGap: 26,
+    grid: {left: scNarrow() ? 40 : 54, right: 20, top: 28, bottom: scNarrow() ? 24 : 34},
+    xAxis: {name: scNarrow() ? "" : "YoY revenue growth", nameLocation: "middle", nameGap: 26,
       nameTextStyle: {color: muted, fontSize: 12}, type: "value",
       axisLabel: {color: muted, fontSize: 12, formatter: v => v + "%"},
       splitLine: {lineStyle: {color: grid}}, axisLine: {lineStyle: {color: baseline}}},
-    yAxis: {name: "Operating margin", nameLocation: "middle", nameGap: 40,
+    yAxis: {name: scNarrow() ? "" : "Operating margin", nameLocation: "middle", nameGap: 40,
       nameTextStyle: {color: muted, fontSize: 12}, type: "value",
       /* Headroom so the topmost point's direct label is never clipped. */
       max: v => Math.ceil((v.max + 6) / 5) * 5,
@@ -314,7 +336,15 @@ function rankedBar(id, metric, fmt, opts = {}) {
              4.5:1 as TEXT for 2.3.6 to permit the hue at all. */
           color: isSubject(p.tk) ? inkS1 : ink2, fontSize: 12,
           fontWeight: isSubject(p.tk) ? 700 : 400}})),
-      symbolSize: d => 12 + 34 * Math.sqrt(d[2] / maxRev)}],
+      /* Nudge labels apart rather than hide any. At 320px the FormFactor
+         bubble covered inTEST's label down to "inT" and Onto Innovation's
+         label sat on its own point. Those are Rain points, so an occluded
+         label is 2.3.6's compensating condition going missing, not a
+         cosmetic overlap. hideOverlap stays false: a hidden label is a
+         dropped condition. */
+      labelLayout: {moveOverlap: "shiftY", hideOverlap: false},
+      symbolSize: d => (scNarrow() ? 7 : 12) +
+        (scNarrow() ? 17 : 34) * Math.sqrt(d[2] / maxRev)}],
   });
   charts.push(sc);
 
@@ -359,7 +389,11 @@ function rankedBar(id, metric, fmt, opts = {}) {
     c.setOption({
       aria: {enabled: false},
       /* right reserves room for the direct end-labels added below. */
-      grid: {left: 8, right: 64, top: 10, bottom: 4, containLabel: true},
+      /* Right gutter measured, not typed: the end-labels are the direct
+         labels that make Rain legal, and at 320px a fixed 62px pushed them
+         inside the plot and over the line ends they name. */
+      grid: {left: 8, top: 10, bottom: 4, containLabel: true,
+        right: Math.max(46, Math.min(72, Math.round((document.getElementById(id).clientWidth || 520) * 0.22)))},
       xAxis: {type: "category", data: P, axisTick: {show: false}, axisLine: {lineStyle: {color: baseline}},
         /* Every fiscal-year start at full width; every OTHER year once the
            plot is narrow. Raising these labels from 10px to the 12px floor
