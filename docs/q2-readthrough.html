@@ -365,6 +365,7 @@ var CASCADIA_DATA = {
   var colr = [RAIN, S1, S2, RAIN];
   var labelInk = [INK, I1, I2, INK];
 
+  var c1Narrow = (document.getElementById("c1").clientWidth || 520) < 420;
   var c1 = echarts.init(document.getElementById("c1"), "cascadia", { renderer: "svg" });
   c1.setOption({
     /* ECharts' own aria is OFF, deliberately. The theme enables it, but ECharts
@@ -388,8 +389,14 @@ var CASCADIA_DATA = {
                (isTotal ? "" : "<br><span style='color:" + MUTED + "'>contribution to the change</span>");
       }
     },
+    /* Every label, wrapped to a measured width. At 320px the four category
+       labels ran together into "Q1 FY26Revenue Margin Q2 FY26" with the
+       second lines overprinting each other. Width comes from the container,
+       never a typed constant. */
     xAxis: Object.assign({ type: "category", data: cats }, axisCommon,
-      { axisLabel: { color: INK2, fontSize: 12, lineHeight: 15, interval: 0 } }),
+      { axisLabel: { color: INK2, fontSize: 12, lineHeight: 15, interval: 0,
+          width: Math.max(40, Math.floor((document.getElementById("c1").clientWidth || 520) / cats.length) - 18),
+          overflow: "break", hideOverlap: false } }),
     yAxis: Object.assign({ type: "value", name: "$M", nameTextStyle: { color: MUTED, fontSize: 12 },
       splitLine: { lineStyle: { color: GRID } } }, axisCommon),
     series: [
@@ -411,7 +418,18 @@ var CASCADIA_DATA = {
             return (i === 0 || i === 3 ? "" : "+") + "$" + vals[i].toFixed(1) + "M";
           }
         },
-        data: vals }
+        /* Stagger the value labels rather than drop any. At 320px "+$31.8M"
+           and "$130.9M" merged into one string; both are direct labels on
+           Rain-or-palette bars and neither is optional.
+           The offset is applied per bar rather than left to moveOverlap, which
+           only fires once labels genuinely intersect and so left them touching
+           with no gutter. Narrow widths only — at the design width there is
+           room and a staggered row would be noise. */
+        data: vals.map(function (v, i) {
+          return c1Narrow && i % 2 === 1
+            ? { value: v, label: { offset: [0, -17] } }
+            : v;
+        }) }
     ]
   });
 
@@ -466,9 +484,14 @@ var CASCADIA_DATA = {
     },
     xAxis: Object.assign({ type: "category", boundaryGap: false, data: xs }, axisCommon,
       { axisLabel: { color: INK2, fontSize: 11 } }),
+    /* axisLabel goes AFTER axisCommon. Object.assign let axisCommon's own
+       axisLabel overwrite this one wholesale, which silently dropped the
+       percent formatter — the axis read "36, 41, 46, 51, 56" with no unit
+       and two seats stumbled on it. The formatter had been written
+       correctly and never rendered. */
     yAxis: Object.assign({ type: "value", min: 36, max: 56, interval: 5,
-      axisLabel: { color: MUTED, fontSize: 12, formatter: "{value}%" },
-      splitLine: { lineStyle: { color: GRID } } }, axisCommon),
+      splitLine: { lineStyle: { color: GRID } } }, axisCommon,
+      { axisLabel: { color: MUTED, fontSize: 12, formatter: "{value}%" } }),
     series: [
       mk("GAAP", S1, I1, [D.q1.gm, D.q2.gm], 4),
       mk("ex-restr.", S2, I2, [D.normalized.q1, D.normalized.q2], 1),
