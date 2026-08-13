@@ -14,6 +14,11 @@
 <meta name="twitter:image" content="https://www.robbinsanalytics.com/cascadia-finance/assets/og-finance.png">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/cascadia.css">
+<style>
+  /* The one-time-item footnotes, in the card with the chart they mark. */
+  .eps-notes { margin: 2px 0 0 2px; }
+  .eps-note { display: block; font-size: 12px; line-height: 1.45; color: var(--ink-2); }
+</style>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
 <!-- Local, and after ECharts so registerTheme('cascadia') finds it. -->
 <script src="assets/cascadia-echarts-theme.js"></script>
@@ -68,7 +73,7 @@
       </div>
       <div class="chart-card">
         <!-- K2: all three figures are printed in the opex callout. -->
-        <h3>Total opex held at 31.0% of revenue — R&amp;D 13.6%, SG&amp;A 14.3%</h3>
+        <h3>Operating expenses run 31.0% of revenue, down about five points since early 2025</h3>
         <p class="chart-sub">% of revenue: R&amp;D, SG&amp;A, total opex</p>
         <div class="chart" id="chart-opex"></div>
       </div>
@@ -77,9 +82,10 @@
              outliers are already marked ① and ② on the bars and footnoted in
              Data &amp; method, so the title names what the page already explains
              rather than asserting anything new. -->
-        <h3>Diluted EPS of $0.26 is up $0.18 year on year; the two spikes are one-time items, not trend</h3>
-        <p class="chart-sub">$ per share, GAAP · ① ② are footnoted one-time items</p>
+        <h3>Diluted EPS of $0.26 is up $0.18 year on year; the two flagged quarters are one-time items, not trend</h3>
+        <p class="chart-sub">$ per share, GAAP</p>
         <div class="chart" id="chart-eps"></div>
+        <p class="eps-notes" id="eps-notes"></p>
       </div>
     </div>
   </section>
@@ -274,8 +280,19 @@ document.getElementById("callouts").innerHTML = [
     },
     animationDuration: 350,
   };
+  /* Fiscal-year starts at full width; every OTHER year once the plot is
+     narrow. At 320px eight year labels collided into one unreadable run of
+     digits on every chart here. Read live off the container so it
+     re-evaluates whenever the ResizeObserver redraws, and keyed to the
+     chart's own width rather than the window's. */
+  const yearTicks = id => (i, v) =>
+    v.endsWith("Q1") &&
+    (document.getElementById(id).clientWidth >= 420 || +v.slice(0, 4) % 2 === 0);
+
   const mk = (id, opt) => {
     const c = echarts.init(document.getElementById(id), "cascadia", {renderer: "canvas"});
+    opt = {...opt, xAxis: {...opt.xAxis,
+      axisLabel: {...opt.xAxis.axisLabel, interval: yearTicks(id)}}};
     c.setOption(opt);
     return c;
   };
@@ -319,7 +336,12 @@ document.getElementById("callouts").innerHTML = [
     /* right reverts to base (14): the inline end-labels that needed the extra
        64px of clearance are gone — see the series note below. */
     grid: {...base.grid, top: 34},
-    legend: {top: 0, right: 0, icon: "roundRect", itemWidth: 12, itemHeight: 8,
+    /* show:true is NOT optional here. The vendored theme sets
+       legend: {show: false} — direct labels are its default — so a legend
+       declared without it renders nothing. That is exactly what happened:
+       this chart shipped with three same-weight lines, colour as the only
+       channel, and no key. All four panel seats hit it. */
+    legend: {show: true, top: 0, right: 0, icon: "roundRect", itemWidth: 12, itemHeight: 8,
              textStyle: {color: ink2, fontSize: 12}},
     yAxis: {...base.yAxis, axisLabel: {...base.yAxis.axisLabel, formatter: v => v + "%"}},
     tooltip: {...base.tooltip, formatter: ps => {
@@ -358,6 +380,13 @@ document.getElementById("callouts").innerHTML = [
           + "& obsolete inventory charges, plus $8.4M restructuring (Q4-2022 "
           + "release; FY2022 Form 10-K, year ended Dec 31 2022)."},
   };
+  /* Rule 4.3 — the caveat travels with the chart. The subtitle promised a
+     footnote and the footnote lived in Data & method, two screens down, so
+     lifting this chart into a slide stranded it. Three seats asked what the
+     markers meant. */
+  document.getElementById("eps-notes").innerHTML = Object.keys(epsNotes)
+    .map(per => `<span class="eps-note">${epsNotes[per].n} ${epsNotes[per].text}</span>`)
+    .join("");
   charts.push(mk("chart-eps", {...base,
     yAxis: {...base.yAxis, axisLabel: {...base.yAxis.axisLabel, formatter: v => "$" + v.toFixed(2)}},
     tooltip: {...base.tooltip, formatter: ps => {
