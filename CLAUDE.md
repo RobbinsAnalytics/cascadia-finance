@@ -22,11 +22,19 @@ be compared against. Only run it to deliberately refresh the dataset.
 together.** Never invoke it unscoped during an extension; it will rebuild
 frozen pages as a side effect of touching one.
 
-**`governance/freeze.toml` is the authoritative protected-path list** — 18
-paths. It is read by `src/validate_freeze.py` *and* by check 5 of
-`src/validate_q2_filed.py`, so there is exactly one answer to "what is frozen?"
-Two copies of that list is how they drift apart unnoticed; that is why the
-hardcoded `frozen_paths()` was removed.
+**`governance/freeze.toml` is the authoritative protected-path list.** It is
+read by `src/validate_freeze.py` *and* by check 5 of `src/validate_q2_filed.py`,
+so there is exactly one answer to "what is frozen?" Two copies of that list is
+how they drift apart unnoticed; that is why the hardcoded `frozen_paths()` was
+removed. **Do not restate the count here** — this line said "18 paths" while the
+file resolved to 19, because the patterns glob and a Q2 `companyfacts_*.json`
+landed inside one of them without touching this sentence. Both gates print the
+number they actually checked; read it there.
+
+**`src/validate.py` is itself a protected path.** Freezing only the data left
+the obvious hole: a build that weakens a check reports PASS against a check that
+has stopped testing anything. Changing a check is a declared `permitted_edit`,
+not an ordinary commit.
 
 **Edits to frozen pages are authorized one at a time, and only non-numeric
 ones.** Two have been authorized so far: the `q2-readthrough.html` cross-link

@@ -56,6 +56,23 @@ protected_paths = [
   # to frozen pages arriving by a route the gate could not see. Protected so
   # that edit is a gate event rather than an invisible one.
   "docs/assets/cascadia.css",
+
+  # The validator itself. Everything above this line is DATA, and freezing only
+  # the data leaves the obvious hole: a build that weakens a check reports PASS
+  # against a check that is no longer testing anything, and the report reads
+  # exactly as it did before. The suite shares an author with the pipeline it
+  # validates, so nothing external would catch it.
+  #
+  # Protected here rather than trusted, which makes changing a check a declared
+  # `permitted_edit` below — visible, dated and argued — instead of an ordinary
+  # commit. This is the other half of `prove_failable` in that file: proving a
+  # check CAN fail is worth little if the check can be quietly softened after.
+  #
+  # NOT protected, and deliberately: `src/validate_freeze.py` is copied verbatim
+  # from cascadia-standards and is governed there, not here. Freezing this
+  # module's copy against this module's baseline would assert local ownership of
+  # a file the template owns.
+  "src/validate.py",
 ]
 
 # ---------------------------------------------------------------------------
