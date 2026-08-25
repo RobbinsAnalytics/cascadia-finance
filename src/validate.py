@@ -33,8 +33,11 @@ Usage:
 
 import csv
 import json
+import shutil
 import sys
+import tempfile
 from collections import defaultdict
+from contextlib import contextmanager
 from datetime import date
 from pathlib import Path
 
@@ -299,6 +302,137 @@ def spot_check_table():
     return lines
 
 
+# ===========================================================================
+# Proving the checks CAN fail
+# ===========================================================================
+#
+# Every check above passes. That on its own is worth very little: a check that
+# cannot fail passes for the same reason a deleted check passes, and the report
+# reads identically either way. This suite shares an author with the pipeline it
+# validates, which is exactly the condition under which a check quietly stops
+# testing anything and nobody notices.
+#
+# So each check is fed deliberately wrong numbers and must reject them. A check
+# that does NOT trip here is reported as broken, and the run fails.
+#
+# THE FROZEN SNAPSHOT IS NEVER TOUCHED. The conformed CSVs are copied to a
+# temporary directory, the copy is corrupted, and the module's path constants
+# are repointed at the copy for the duration of one check. data/raw/ and
+# data/conformed/ are opened read-only and restored paths are asserted after
+# every scenario. Corrupting the real files to prove a point would fail the
+# freeze gate for a reason that has nothing to do with the data.
+
+
+@contextmanager
+def _corrupted(target: str, mutate):
+    """Repoint one conformed CSV at a corrupted copy, for one check only.
+
+    `target` is the module-global name of the path constant to swap. `mutate`
+    receives the parsed rows as a list of dicts and edits them in place.
+    """
+    globals_ = globals()
+    original = globals_[target]
+    tmpdir = Path(tempfile.mkdtemp(prefix="cascadia-prove-failable-"))
+    try:
+        rows = list(csv.DictReader(open(original, encoding="utf-8")))
+        mutate(rows)
+        copy = tmpdir / original.name
+        with open(copy, "w", encoding="utf-8", newline="") as fh:
+            writer = csv.DictWriter(fh, fieldnames=rows[0].keys())
+            writer.writeheader()
+            writer.writerows(rows)
+        globals_[target] = copy
+        yield
+    finally:
+        globals_[target] = original
+        shutil.rmtree(tmpdir, ignore_errors=True)
+        assert globals_[target] == original, "path constant not restored"
+
+
+def _first(rows, **match):
+    """The first row matching every key=value, with a non-empty value."""
+    for r in rows:
+        if r["value"] != "" and all(r.get(k) == v for k, v in match.items()):
+            return r
+    raise RuntimeError("no row matched %r — the fixture moved" % (match,))
+
+
+def _scale(**match):
+    """Multiply the first matching row's value by 1.5 — a tag/scale slip."""
+    def mutate(rows):
+        row = _first(rows, **match)
+        row["value"] = str(float(row["value"]) * 1.5)
+    return mutate
+
+
+def _blank_unflagged(**match):
+    """Empty a value WITHOUT setting missing — the silent gap the audits exist for."""
+    def mutate(rows):
+        row = _first(rows, **match)
+        row["value"] = ""
+        row["missing"] = "False"
+    return mutate
+
+
+def _failable_scenarios(has_segments, has_peers):
+    """(check function, path constant, mutation, what the corruption represents)."""
+    scenarios = [
+        (check_fy_reconciliation, "CSV_PATH", _scale(metric_code="revenue"),
+         "a revenue quarter inflated 1.5x — quarters no longer sum to the filed FY"),
+        (check_crossfoot, "CSV_PATH", _scale(metric_code="operating_income"),
+         "operating income inflated 1.5x — GP - Opex + Gain no longer closes"),
+        (check_gaps, "CSV_PATH", _blank_unflagged(metric_code="revenue"),
+         "a revenue cell emptied with no missing flag — a silent gap"),
+    ]
+    if has_segments:
+        scenarios += [
+            (check_segment_revenue, "SEG_CSV_PATH",
+             _scale(segment_code="probe_cards", metric_code="seg_revenue"),
+             "probe-card revenue inflated 1.5x — segments no longer tie to consolidated"),
+            (check_segment_gp_bridge, "SEG_CSV_PATH",
+             _scale(segment_code="probe_cards", metric_code="seg_gross_profit"),
+             "probe-card gross profit inflated 1.5x — the bridge no longer closes"),
+            (check_segment_gaps, "SEG_CSV_PATH",
+             _blank_unflagged(segment_code="probe_cards"),
+             "a segment cell emptied with no missing flag — a silent gap"),
+        ]
+    if has_peers:
+        scenarios += [
+            (check_peer_reconciliation, "PEERS_CSV_PATH", _scale(metric_code="revenue"),
+             "a peer revenue quarter inflated 1.5x — that peer no longer reconciles"),
+            (check_peer_gaps, "PEERS_CSV_PATH", _blank_unflagged(metric_code="revenue"),
+             "a peer cell emptied with no missing flag — a silent gap"),
+        ]
+    return scenarios
+
+
+def prove_failable(has_segments, has_peers):
+    print("\nProving each check CAN fail, by feeding it wrong numbers:\n")
+    proofs = []
+    for check, target, mutate, scenario in _failable_scenarios(has_segments, has_peers):
+        probe = []
+        try:
+            with _corrupted(target, mutate):
+                check(probe)
+            name, passed = probe[0][0], probe[0][1]
+            tripped = not passed
+        except Exception as exc:                   # noqa: BLE001
+            # A check that raises on bad input has still rejected it, but say so
+            # rather than scoring it as a clean trip.
+            name, tripped = getattr(check, "__name__", str(check)), True
+            scenario += f"  [raised {type(exc).__name__}]"
+        proofs.append((name, scenario, tripped))
+
+    all_tripped = all(t for _, _, t in proofs)
+    for name, scenario, tripped in proofs:
+        print(f"  [{'TRIPPED' if tripped else 'DID NOT TRIP'}] {name}")
+        print(f"              {scenario}")
+    print()
+    return proofs, all_tripped
+
+
+# ===========================================================================
+
 def main() -> None:
     as_of = json.loads(MANIFEST.read_text())["as_of_date"]
     results = []
@@ -318,8 +452,12 @@ def main() -> None:
         check_peer_gaps(results)
     derived, restated = enumerate_flags()
     spots = spot_check_table()
+    proofs, all_tripped = prove_failable(has_segments, has_peers)
 
-    all_pass = all(ok for _, ok, _, _ in results)
+    # A check that cannot fail is not a passing check. Both conditions gate the
+    # exit code: every check passes on the real data, AND every check rejects
+    # deliberately wrong data.
+    all_pass = all(ok for _, ok, _, _ in results) and all_tripped
 
     md = [
         "# Validation Report — Cascadia Finance",
@@ -339,6 +477,25 @@ def main() -> None:
     for name, ok, _, failures in results:
         if failures:
             md += ["", f"### Failures — {name}", ""] + [f"- {f}" for f in failures]
+
+    md += [
+        "",
+        "## Proof the checks can fail",
+        "",
+        "*Each check above is re-run against a deliberately corrupted copy of the",
+        "conformed data and must reject it. A check that passes corrupted input is",
+        "not testing anything, and reads identically in this report to one that",
+        "works. The frozen snapshot is never modified — the corruption is applied",
+        "to a temporary copy and the path is restored after every scenario.*",
+        "",
+        f"**{sum(1 for _, _, t in proofs if t)} of {len(proofs)} checks rejected "
+        f"deliberately wrong data.**",
+        "",
+        "| Check | Corruption fed to it | Rejected? |",
+        "|-------|----------------------|-----------|",
+    ]
+    for name, scenario, tripped in proofs:
+        md.append(f"| {name} | {scenario} | {'yes' if tripped else '**NO**'} |")
 
     md += [
         "",
