@@ -60,14 +60,44 @@ rooted in it.
 
 ## Committing
 
-**Stage by name — never `git add -A` or `git add .`.** Both are denied in
-`.claude/settings.json`.
+**Stage by name — never blanket-stage the tree.** What enforces this is the
+`PreToolUse` hook `.claude/hooks/no_blanket_add_or_force_push.py`, not the
+`deny` block in `.claude/settings.json`. **The deny block does not bind here:**
+this surface runs in `bypassPermissions` deliberately, and that skips the
+permission layer entirely — measured against `cascadia-curiosities`, where a
+blanket stage *and* a force push both ran to completion with the deny block in
+place. A `PreToolUse` hook is run by Claude Code itself, so it binds regardless
+of mode. The deny block stays where it is: it costs nothing and binds again if
+the mode ever changes. The same hook refuses force pushes, `--force-with-lease`
+included.
+
+**That hook inspects the command string, so it is deliberately coarse.** A
+command that merely *quotes* one of the refused patterns is refused too —
+writing documentation about them from a heredoc, for one. Use the Write or Edit
+tool for such content rather than a shell heredoc.
 
 **Line-ending churn on frozen data is not cosmetic.** CRLF rewrites once showed
 30 files as modified including `data/raw/` and `data/conformed/` — which *are*
 the freeze. It makes "the snapshot is untouched" impossible to assert.
-`.gitattributes` (`* text=auto eol=lf`) prevents it; the `PreToolUse` hook in
-`.claude/hooks/` catches what gets through and refuses the commit.
+`.gitattributes` (`* text=auto eol=lf`) prevents it; `.githooks/` catches what
+gets through and refuses the commit.
+
+**The whitespace check is a git `pre-commit` hook, not a `PreToolUse` one, and
+the move was the point.** A `PreToolUse` hook is handed the index as it stood
+*before* the tool call runs, so staging and committing inside a single call
+passed a check that had already inspected the index. It was not wrong; it was
+early. A git hook runs after the index is final and no command shape outruns it.
+
+**A fresh clone has no gate until it is activated.** The scripts are tracked and
+arrive with the repo; the config line does not. Run once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+**`.githooks/pre-commit` runs two gates** — `no_whitespace_commits.py` and
+`secret_scan.py`. Do not reach for `--no-verify`; that is how a gate stops
+working.
 
 **Run each repo's commits from a session rooted in that repo.** Hooks and this
 file load only from the primary working directory — `/add-dir` shares files and

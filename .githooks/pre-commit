@@ -1,0 +1,83 @@
+#!/bin/sh
+#
+# cascadia-finance pre-commit hook -- runs TWO gates:
+#     no_whitespace_commits.py   (cascadia-standards template v1.0.0)
+#     secret_scan.py             (adopted estate-wide per Q12a)
+#
+# DEVIATION FROM THE TEMPLATE, RECORDED RATHER THAN GLOSSED
+#     The standards template and job-search each `exec` a SINGLE script, so
+#     neither can run two gates. secret_scan.py has no copy in
+#     cascadia-standards or in templates/claude-starter-kit at all -- its
+#     only implementation in the estate is job-search's, which is where
+#     this repo's copy came from. The two `exec` lines below are therefore
+#     the one part of this file NOT copied verbatim.
+#
+#     This shape should move up into cascadia-standards so the estate has a
+#     single two-gate pre-commit rather than three divergent ones. Until it
+#     does, this file will drift from the template it names.
+#
+#     cascadia-standards template v1.0.0
+#     Copied verbatim into each repo's .githooks/. Do not edit per repo.
+#
+# REGISTRATION
+#     This directory is not consulted by git automatically. It is activated
+#     per clone with:
+#
+#         git config core.hooksPath .githooks
+#
+#     That is deliberate. `.git/hooks/` is not version controlled and does not
+#     survive a clone, so a check installed there silently disappears the first
+#     time this repo is cloned. A tracked script plus core.hooksPath keeps the
+#     check itself in history where it can be reviewed, and reduces installing
+#     it to one documented command.
+#
+#     THE ACTIVATION DOES NOT TRAVEL WITH A CLONE. The script does; the config
+#     line does not. A fresh clone has no gate until the line above is run.
+#     That is a real, known cost of this shape and is recorded rather than
+#     glossed -- it is why the line is part of the starter kit's setup step.
+#
+# WHY IT LIVES HERE AND NOT IN .claude/hooks/
+#     It was a PreToolUse hook until 2026-08-24, and it failed open. A
+#     PreToolUse hook inspects the index as it stood BEFORE the tool call runs,
+#     so `git add noisy.md && git commit` staged and committed inside a single
+#     call the hook had already read, and sailed through. Teaching that hook to
+#     parse command strings would have kept it fail-open: `;`, `&&`, a heredoc
+#     or `bash -c` each defeat the next version of the parser. A git hook runs
+#     after the index is final and cannot be outrun by shell syntax.
+#
+#     `git commit --no-verify` does skip this. That is git's own escape hatch,
+#     it is greppable in a shell history, and it is a deliberate act rather
+#     than an accident of command shape. The failure this replaces was an
+#     accident of command shape.
+#
+# INTERPRETER
+#     A hook runs in its own environment, and "python" vs "python3" vs the
+#     Windows launcher is exactly where hooks die silently. Resolve it here
+#     rather than trusting a shebang, and FAIL CLOSED if none is found. A gate
+#     that opens when it breaks is not a gate.
+
+set -e
+
+PY=""
+for candidate in python3 python py; do
+    if command -v "$candidate" >/dev/null 2>&1; then
+        PY="$candidate"
+        break
+    fi
+done
+
+if [ -z "$PY" ]; then
+    echo "" >&2
+    echo "COMMIT BLOCKED -- the whitespace check cannot run." >&2
+    echo "No Python interpreter found on PATH (tried python3, python, py)." >&2
+    echo "This blocks rather than passes, by design." >&2
+    echo "" >&2
+    exit 1
+fi
+
+ROOT=$(git rev-parse --show-toplevel)
+
+# Not `exec` -- that would replace the shell and the second gate would never
+# run. `set -e` above makes either non-zero exit abort the commit.
+"$PY" "$ROOT/.githooks/no_whitespace_commits.py"
+"$PY" "$ROOT/.githooks/secret_scan.py"

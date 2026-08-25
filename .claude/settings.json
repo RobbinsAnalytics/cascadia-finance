@@ -38,7 +38,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python \"${CLAUDE_PROJECT_DIR}/.claude/hooks/no_whitespace_commits.py\""
+            "command": "python \"${CLAUDE_PROJECT_DIR}/.claude/hooks/no_blanket_add_or_force_push.py\""
           }
         ]
       }
