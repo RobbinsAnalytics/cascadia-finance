@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """
-Pre-commit secret scan for job-search.
+Pre-commit secret scan -- the credential gate.
+
+    cascadia-standards template v1.0.0
+    THIS IS THE CANONICAL COPY. Copied verbatim into each repo's .githooks/.
+    Do not edit per repo -- fix it here and re-sync outward.
 
 WHAT THIS IS FOR
     This finds CREDENTIALS in staged content: API keys, tokens, private keys,
@@ -8,8 +12,9 @@ WHAT THIS IS FOR
 
 WHAT THIS IS NOT FOR
     It is NOT a PII scanner. It does not look for salary figures, employer
-    contacts or application history. Those are protected by the repository
-    being private, not by this script. Do not extend it into a PII matcher --
+    contacts or application history. Where such content exists it is protected
+    by the repository being private, not by this script. Do not extend it into
+    a PII matcher --
     a scan that fires on ordinary content in this repo is a scan that gets
     bypassed, and then it protects nothing at all.
 
@@ -187,7 +192,7 @@ def main():
     write = sys.stderr.write
     write("\n")
     write("=" * 72 + "\n")
-    write("  COMMIT BLOCKED -- job-search pre-commit secret scan\n")
+    write("  COMMIT BLOCKED -- pre-commit secret scan\n")
     write("=" * 72 + "\n")
     write("\n")
     write("  %d possible credential(s) found in staged content.\n" % len(findings))
