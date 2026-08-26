@@ -77,7 +77,13 @@ fi
 
 ROOT=$(git rev-parse --show-toplevel)
 
+# ORDER IS LOAD-BEARING (BF53, fixed 2026-08-25). The credential gate runs
+# FIRST. Under `set -e` a noisy whitespace diff would otherwise abort the
+# commit before secret_scan.py ever ran, so a staged credential would go
+# unreported. A whitespace complaint must never be the reason a credential
+# refusal goes unread.
+#
 # Not `exec` -- that would replace the shell and the second gate would never
 # run. `set -e` above makes either non-zero exit abort the commit.
-"$PY" "$ROOT/.githooks/no_whitespace_commits.py"
 "$PY" "$ROOT/.githooks/secret_scan.py"
+"$PY" "$ROOT/.githooks/no_whitespace_commits.py"
