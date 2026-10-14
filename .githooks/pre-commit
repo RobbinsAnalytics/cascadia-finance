@@ -1,23 +1,35 @@
 #!/bin/sh
 #
-# cascadia-finance pre-commit hook -- runs TWO gates:
-#     no_whitespace_commits.py   (cascadia-standards template v1.0.0)
-#     secret_scan.py             (adopted estate-wide per Q12a)
+# Cascadia pre-commit hook -- runs two gates, in this order:
 #
-# DEVIATION FROM THE TEMPLATE, RECORDED RATHER THAN GLOSSED
-#     The standards template and job-search each `exec` a SINGLE script, so
-#     neither can run two gates. secret_scan.py has no copy in
-#     cascadia-standards or in templates/claude-starter-kit at all -- its
-#     only implementation in the estate is job-search's, which is where
-#     this repo's copy came from. The two `exec` lines below are therefore
-#     the one part of this file NOT copied verbatim.
+#     1. secret_scan.py            -- the credential gate
+#     2. no_whitespace_commits.py  -- the whitespace check
 #
-#     This shape should move up into cascadia-standards so the estate has a
-#     single two-gate pre-commit rather than three divergent ones. Until it
-#     does, this file will drift from the template it names.
+#     cascadia-standards template v2.1.0
+#     THIS IS THE CANONICAL COPY. Copied verbatim into each repo's .githooks/.
+#     Do not edit per repo -- fix it here and re-sync outward.
 #
-#     cascadia-standards template v1.0.0
-#     Copied verbatim into each repo's .githooks/. Do not edit per repo.
+# ORDER IS LOAD-BEARING.
+#     The credential gate runs FIRST. `set -e` aborts the commit on the first
+#     non-zero exit, so with the whitespace check first a noisy line-ending
+#     diff aborts the commit BEFORE the credential scan ever runs -- and a
+#     staged credential goes unreported behind a complaint about whitespace.
+#     A whitespace complaint must never be the reason a credential refusal
+#     goes unread. The two failures are not comparable: one is cosmetic and
+#     one reaches a remote, and anything that reaches a remote does not stay
+#     on this machine.
+#
+#     Any copy of this file that runs the checks in the other order is wrong
+#     rather than merely divergent, and re-syncing it from this file is the
+#     fix. Recorded as BF53. Deliberately stated as a rule and not as a list
+#     of which repos are currently wrong: this file is copied verbatim into
+#     every repo in the estate, so a dated claim about a named repo is false
+#     in ten places the moment it is fixed in one.
+#
+# NOT `exec` ON THE FIRST GATE.
+#     `exec` replaces the shell, so an `exec`ed first gate means the second
+#     never runs. Only the last line may use it. A single-`exec` pre-commit
+#     cannot chain two gates at all, which is what this file used to be.
 #
 # REGISTRATION
 #     This directory is not consulted by git automatically. It is activated
@@ -26,41 +38,37 @@
 #         git config core.hooksPath .githooks
 #
 #     That is deliberate. `.git/hooks/` is not version controlled and does not
-#     survive a clone, so a check installed there silently disappears the first
+#     survive a clone, so a gate installed there silently disappears the first
 #     time this repo is cloned. A tracked script plus core.hooksPath keeps the
-#     check itself in history where it can be reviewed, and reduces installing
+#     gate itself in history where it can be reviewed, and reduces installing
 #     it to one documented command.
 #
-#     THE ACTIVATION DOES NOT TRAVEL WITH A CLONE. The script does; the config
+#     THE ACTIVATION DOES NOT TRAVEL WITH A CLONE. The scripts do; the config
 #     line does not. A fresh clone has no gate until the line above is run.
 #     That is a real, known cost of this shape and is recorded rather than
 #     glossed -- it is why the line is part of the starter kit's setup step.
-#
-# WHY IT LIVES HERE AND NOT IN .claude/hooks/
-#     It was a PreToolUse hook until 2026-08-24, and it failed open. A
-#     PreToolUse hook inspects the index as it stood BEFORE the tool call runs,
-#     so `git add noisy.md && git commit` staged and committed inside a single
-#     call the hook had already read, and sailed through. Teaching that hook to
-#     parse command strings would have kept it fail-open: `;`, `&&`, a heredoc
-#     or `bash -c` each defeat the next version of the parser. A git hook runs
-#     after the index is final and cannot be outrun by shell syntax.
-#
-#     `git commit --no-verify` does skip this. That is git's own escape hatch,
-#     it is greppable in a shell history, and it is a deliberate act rather
-#     than an accident of command shape. The failure this replaces was an
-#     accident of command shape.
 #
 # INTERPRETER
 #     A hook runs in its own environment, and "python" vs "python3" vs the
 #     Windows launcher is exactly where hooks die silently. Resolve it here
 #     rather than trusting a shebang, and FAIL CLOSED if none is found. A gate
 #     that opens when it breaks is not a gate.
+#
+#     A NAME THAT RESOLVES IS NOT AN INTERPRETER THAT RUNS. On 2026-10-12 a
+#     Windows App Installer execution alias named python3 satisfied
+#     `command -v`, printed a Store advertisement and exited non-zero, and
+#     v2.0.0 of this file refused every commit on that machine for a day while
+#     a working interpreter sat two names further down the loop. So a candidate
+#     is accepted only if it also runs `-c pass`. The order is unchanged, and a
+#     loop that finds nothing runnable still blocks. hook_test_matrix.py drives
+#     a real commit with a non-functional python3 first on PATH and expects the
+#     commit to go through (v3.1.0).
 
 set -e
 
 PY=""
 for candidate in python3 python py; do
-    if command -v "$candidate" >/dev/null 2>&1; then
+    if command -v "$candidate" >/dev/null 2>&1 && "$candidate" -c pass >/dev/null 2>&1; then
         PY="$candidate"
         break
     fi
@@ -68,8 +76,9 @@ done
 
 if [ -z "$PY" ]; then
     echo "" >&2
-    echo "COMMIT BLOCKED -- the whitespace check cannot run." >&2
-    echo "No Python interpreter found on PATH (tried python3, python, py)." >&2
+    echo "COMMIT BLOCKED -- the pre-commit gates cannot run." >&2
+    echo "No working Python interpreter found on PATH (tried python3, python, py;" >&2
+    echo "a name that resolves but cannot run '-c pass' is skipped)." >&2
     echo "This blocks rather than passes, by design." >&2
     echo "" >&2
     exit 1
@@ -77,13 +86,8 @@ fi
 
 ROOT=$(git rev-parse --show-toplevel)
 
-# ORDER IS LOAD-BEARING (BF53, fixed 2026-08-25). The credential gate runs
-# FIRST. Under `set -e` a noisy whitespace diff would otherwise abort the
-# commit before secret_scan.py ever ran, so a staged credential would go
-# unreported. A whitespace complaint must never be the reason a credential
-# refusal goes unread.
-#
-# Not `exec` -- that would replace the shell and the second gate would never
-# run. `set -e` above makes either non-zero exit abort the commit.
+# Credential gate first. `set -e` aborts here on failure.
 "$PY" "$ROOT/.githooks/secret_scan.py"
-"$PY" "$ROOT/.githooks/no_whitespace_commits.py"
+
+# Then the whitespace check. Last gate, so `exec` is safe.
+exec "$PY" "$ROOT/.githooks/no_whitespace_commits.py"

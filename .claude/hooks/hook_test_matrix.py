@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Runnable test matrix for this repo's three commit guards.
 
-    cascadia-standards template v3.0.0
+    cascadia-standards template v3.1.0
     Copied verbatim into each repo. Do not edit per repo.
 
 Run it:
@@ -42,6 +42,15 @@ THREE GUARDS, TWO SURFACES, AND THE SPLIT IS DELIBERATE
       it reads the index as it stood BEFORE the call, so `git add x && git
       commit` outran it. Moved 2026-08-24. The last section below proves the
       move end to end by driving a real commit.
+
+THE INTERPRETER THE HOOK RESOLVES IS PART OF WHAT IS TESTED (v3.1.0)
+
+  The end-to-end section's last case puts a directory first on PATH holding a
+  `python3` that resolves and cannot run -- the shape of the Windows App
+  Installer alias that refused every commit on this machine on 2026-10-12 --
+  beside a `python` that runs. A real commit must go through, which means the
+  hook skipped the name that merely resolved. The pre-commit under test is
+  this repo's canonical copy, copied into the scratch repo.
 
 THE CREDENTIAL FIXTURES ARE ASSEMBLED AT RUNTIME, NOT WRITTEN OUT
 
@@ -142,8 +151,8 @@ BLANKET_CASES = [
 # failure mode of a staging test is destructive.
 # ---------------------------------------------------------------------------
 
-def git(cwd, *args):
-    return subprocess.run(("git",) + args, cwd=cwd, capture_output=True, text=True)
+def git(cwd, *args, env=None):
+    return subprocess.run(("git",) + args, cwd=cwd, capture_output=True, text=True, env=env)
 
 
 def build_scratch_repo(root):
@@ -357,6 +366,37 @@ def main():
                                          "control: the guard does not block real work"))
         if not ok:
             failures.append("end-to-end: a real change was blocked (%s)" % r.stderr.strip()[:120])
+
+        # --- the interpreter: a name that resolves is not one that runs ---
+        # A stub `python3` that exits non-zero, first on PATH, beside a `python`
+        # that hands off to the interpreter running this matrix. Both are sh
+        # scripts because git runs hooks under sh on every platform, Windows
+        # included. The hook must pass over the stub and the commit must land.
+        rows += 1
+        stub_dir = tempfile.mkdtemp(prefix="cascadia-stub-python-")
+        try:
+            real = sys.executable.replace("\\", "/")
+            with open(os.path.join(stub_dir, "python3"), "w", newline="\n") as fh:
+                fh.write("#!/bin/sh\necho 'Python was not found; this is a stub' >&2\nexit 49\n")
+            with open(os.path.join(stub_dir, "python"), "w", newline="\n") as fh:
+                fh.write('#!/bin/sh\nexec "%s" "$@"\n' % real)
+            for name in ("python3", "python"):
+                os.chmod(os.path.join(stub_dir, name), 0o755)
+            env = dict(os.environ)
+            env["PATH"] = stub_dir + os.pathsep + env.get("PATH", "")
+            git(root, "reset", "-q"); git(root, "checkout", "-q", "--", ".")
+            open(os.path.join(root, "real.md"), "wb").write(b"alpha\nbeta\nzeta\n")
+            git(root, "add", "real.md")
+            r = git(root, "commit", "-m", "a stub python3 sits first on PATH", env=env)
+        finally:
+            shutil.rmtree(stub_dir, ignore_errors=True)
+        ok = r.returncode == 0
+        print("  %s  %-6s  %-46s  %s" % ("ok  " if ok else "FAIL", ALLOW,
+                                         "stub python3 first on PATH && git commit",
+                                         "the hook skips a name that resolves but cannot run"))
+        if not ok:
+            failures.append("interpreter: the hook accepted a python3 that cannot run (%s)"
+                            % r.stderr.strip()[:120])
     finally:
         git(root, "reset", "-q", "--hard")
         shutil.rmtree(root, ignore_errors=True)
