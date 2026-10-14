@@ -118,9 +118,13 @@ for the last extension is `.claude/skills/q2-filed-build/SKILL.md`. New periods
 are **additive**: new ingest, new conformed file, new page, own manifest with
 its own actual retrieval date. Nothing existing is re-pulled or re-stamped.
 
-`src/validate_freeze.py` is copied verbatim from `cascadia-standards` (template
-v1.0.0). Never edit it here — module-specific behaviour belongs in
-`governance/freeze.toml`.
+`src/validate_freeze.py` is copied verbatim from
+`cascadia-standards/templates/validate_freeze.py` and prints its template
+version on every run; read it there rather than here. Never edit it here —
+module-specific behaviour belongs in `governance/freeze.toml`. Since template
+v1.1.0 (2026-10-14) it resolves protected patterns against git — the baseline
+tree, the index and untracked paths — not the filesystem, so an untracked file
+under a protected pattern fails the gate.
 
 ## Content
 
